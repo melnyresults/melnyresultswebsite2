@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { saveMarketingSubmission } from '../lib/localStorage';
 
 const FreeMarketingAnalysisPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,26 +33,22 @@ const FreeMarketingAnalysisPage: React.FC = () => {
     setError(null);
     
     try {
-      const { error } = await supabase
-        .from('marketing_analysis_submissions')
-        .insert([{
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          company_name: formData.companyName,
-          how_did_you_find_us: formData.howDidYouFindUs,
-          monthly_spend: formData.monthlySpend,
-          website: formData.website
-        }]);
-
-      if (error) throw error;
+      saveMarketingSubmission({
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        company_name: formData.companyName,
+        how_did_you_find_us: formData.howDidYouFindUs,
+        monthly_spend: formData.monthlySpend,
+        website: formData.website
+      });
       
       // Redirect to thank you page
       navigate('/thankyou-consult');
     } catch (err) {
       console.error('Form submission error:', err);
-      setError(err instanceof Error ? err.message : 'There was an error submitting your request. Please try again.');
+      setError('There was an error submitting your request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

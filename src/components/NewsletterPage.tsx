@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Mail, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { saveNewsletterSignup } from '../lib/localStorage';
 
 const NewsletterPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,26 +26,17 @@ const NewsletterPage: React.FC = () => {
     setError(null);
     
     try {
-      const { error } = await supabase
-        .from('newsletter_signups')
-        .insert([{
-          email: formData.email
-        }]);
-
-      if (error) {
-        // Handle duplicate email error gracefully
-        if (error.code === '23505') {
-          setError('This email is already subscribed to our newsletter.');
-        } else {
-          throw error;
-        }
+      const result = saveNewsletterSignup(formData.email);
+      
+      if (!result.success) {
+        setError(result.error || 'Failed to sign up for newsletter');
       } else {
         // Redirect to thank you page
         navigate('/newsletter/thank-you');
       }
     } catch (err) {
       console.error('Newsletter signup error:', err);
-      setError(err instanceof Error ? err.message : 'There was an error signing you up. Please try again.');
+      setError('There was an error signing you up. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

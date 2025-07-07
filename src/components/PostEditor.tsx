@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Eye, Calendar, User, Image } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BlogPost } from '../lib/supabase';
+import { BlogPost } from '../lib/localStorage';
 import RichTextEditor from './RichTextEditor';
 
 const PostEditor: React.FC = () => {

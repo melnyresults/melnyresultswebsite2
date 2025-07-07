@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Menu, X as CloseIcon, ArrowLeft, Calendar, User, Clock, Heart, Share2, MessageCircle } from 'lucide-react';
 import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BlogPost } from '../lib/supabase';
+import { BlogPost } from '../lib/localStorage';
 
 const BlogPostPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
