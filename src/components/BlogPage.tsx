@@ -58,6 +58,15 @@ const BlogPage: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-blue mx-auto mb-4"></div>
           <p className="text-gray-600">Loading blog posts...</p>
+          
+          {/* Logo */}
+          <div className="mt-8">
+            <img 
+              src="/src/assets/image (10).png" 
+              alt="Melny Results Logo" 
+              className="h-48 w-auto mx-auto"
+            />
+          </div>
         </div>
       </div>
     );
