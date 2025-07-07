@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { BlogPost } from '../lib/localStorage';
 import RichTextEditor from './RichTextEditor';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const PostEditor: React.FC = () => {
   const { id } = useParams();
@@ -31,6 +32,14 @@ const PostEditor: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  
+  usePageMeta({
+    title: `${isEditing ? 'Edit Post' : 'New Post'} - Melny Results Admin`,
+    description: `${isEditing ? 'Edit an existing' : 'Create a new'} blog post for Melny Results marketing blog.`,
+    keywords: 'blog editor, content creation, post editor, blog management',
+    ogTitle: `${isEditing ? 'Edit Post' : 'New Post'} - Blog Editor`,
+    ogDescription: `${isEditing ? 'Edit your' : 'Create a new'} blog post with our rich text editor.`,
+  });
 
   const categories = ['Growth Strategies', 'Success Stories', 'Tips', 'Case Studies'];
 

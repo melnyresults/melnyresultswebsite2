@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Menu, X as CloseIcon, ArrowLeft, Calendar, User, Clock, Heart, Share2, MessageCircle, Facebook, Twitter, Linkedin, Copy, Tag } from 'lucide-react';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { BlogPost } from '../lib/localStorage';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const BlogPostPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,6 +46,16 @@ const BlogPostPage: React.FC = () => {
       setLoading(false);
     }
   }, [posts, slug]);
+  
+  // Update meta tags when post is loaded
+  usePageMeta({
+    title: post ? `${post.title} - Melny Results Blog` : 'Post Not Found - Melny Results',
+    description: post ? (post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
+    keywords: post ? 'marketing strategy, business growth, lead generation, digital marketing' : 'blog, marketing',
+    ogTitle: post ? post.title : 'Post Not Found',
+    ogDescription: post ? (post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
+    ogImage: post?.image_url,
+  });
 
   // Scroll spy for table of contents
   useEffect(() => {

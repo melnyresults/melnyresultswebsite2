@@ -2,10 +2,19 @@ import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Mail, FileText, Phone, ArrowRight, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const ThankYouConsultPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { posts } = useBlogPosts();
+  
+  usePageMeta({
+    title: 'Thank You - Free Marketing Analysis Request - Melny Results',
+    description: 'Thanks for signing up! We\'re analyzing your business right now. Ivan will personally review your information and get in touch within 24 hours.',
+    keywords: 'thank you, marketing analysis, business consultation, growth plan',
+    ogTitle: 'Thanks for Signing Up! - Melny Results',
+    ogDescription: 'We\'re analyzing your business right now—here\'s what to expect next.',
+  });
 
   const createSlug = (title: string, id: string) => {
     const slug = title

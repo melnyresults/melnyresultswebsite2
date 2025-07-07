@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Clipboard, Shield, Star, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { saveMarketingSubmission } from '../lib/localStorage';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const FreeMarketingAnalysisPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,6 +19,14 @@ const FreeMarketingAnalysisPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  usePageMeta({
+    title: 'Free Marketing Analysis - Melny Results',
+    description: 'Get a custom marketing strategy tailored to your business — no cost, no catch. Claim your free growth plan today.',
+    keywords: 'free marketing analysis, marketing strategy, business growth plan, lead generation, digital marketing consultation',
+    ogTitle: 'Claim Your Free Marketing Analysis - No Contracts. No Pressure.',
+    ogDescription: 'Fill out the form and we\'ll send you a custom plan to get more clients — fast.',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

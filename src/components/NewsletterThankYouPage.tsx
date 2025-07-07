@@ -2,10 +2,19 @@ import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Mail, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const NewsletterThankYouPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { posts } = useBlogPosts();
+  
+  usePageMeta({
+    title: 'Thank You - Newsletter Subscription - Melny Results',
+    description: 'You\'re almost in! Check your inbox for a confirmation email to complete your subscription to our marketing newsletter.',
+    keywords: 'newsletter confirmation, email subscription, marketing tips, business growth',
+    ogTitle: 'You\'re Almost In! - Melny Results Newsletter',
+    ogDescription: 'Check your inbox for a confirmation email to complete your subscription.',
+  });
 
   const createSlug = (title: string, id: string) => {
     const slug = title

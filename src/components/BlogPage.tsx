@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 import { Menu, X as CloseIcon, Search, Calendar, User, ArrowRight, Clock, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const BlogPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const { posts, loading } = useBlogPosts();
+  
+  usePageMeta({
+    title: 'Marketing Blog - Melny Results',
+    description: 'Get proven marketing strategies, case studies, and growth tactics that actually work. No fluff. No theory. Just actionable insights.',
+    keywords: 'marketing blog, business growth tips, marketing strategies, lead generation, digital marketing insights',
+    ogTitle: 'Marketing Insights That Actually Work - Melny Results Blog',
+    ogDescription: 'No fluff. No theory. Just proven strategies to grow your business faster.',
+  });
 
   const categories = ['Growth Strategies', 'Success Stories', 'Tips', 'Case Studies'];
 

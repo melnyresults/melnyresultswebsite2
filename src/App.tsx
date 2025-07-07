@@ -22,6 +22,7 @@ import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
 import GenerativeEngineOptimizationPage from './components/GenerativeEngineOptimizationPage';
 import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngineOptimizationThanksPage';
+import { usePageMeta } from './hooks/usePageMeta';
 
 // Component to handle scroll to top on route change
 function ScrollToTop() {
@@ -69,6 +70,14 @@ function useScrollAnimation() {
 
 function HomePage() {
   useScrollAnimation();
+  
+  usePageMeta({
+    title: 'Melny Results - Online Marketing Agency',
+    description: 'Melny Results is an online marketing agency that becomes your marketing department on-demand. More Growth. More Clients. Guaranteed.',
+    keywords: 'marketing agency, digital marketing, lead generation, business growth, marketing strategy, guaranteed results',
+    ogTitle: 'Melny Results - More Growth. More Clients. Guaranteed.',
+    ogDescription: 'No contracts. No fluff. Just results — or you owe us nothing. Get your free growth plan today.',
+  });
   
   return (
     <div className="min-h-screen bg-white">

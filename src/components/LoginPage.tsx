@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const LoginPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,6 +16,14 @@ const LoginPage: React.FC = () => {
 
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  
+  usePageMeta({
+    title: 'Admin Login - Melny Results',
+    description: 'Sign in to the Melny Results admin dashboard to manage blog posts and content.',
+    keywords: 'admin login, dashboard, blog management, content management',
+    ogTitle: 'Admin Login - Melny Results',
+    ogDescription: 'Access the admin dashboard to manage your content.',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

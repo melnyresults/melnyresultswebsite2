@@ -3,12 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, LogOut, Eye, Calendar, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const { posts, loading, deletePost } = useBlogPosts();
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  usePageMeta({
+    title: 'Blog Dashboard - Melny Results Admin',
+    description: 'Manage your blog posts, view analytics, and create new content for Melny Results.',
+    keywords: 'blog dashboard, admin panel, content management, blog analytics',
+    ogTitle: 'Blog Dashboard - Admin Panel',
+    ogDescription: 'Manage your blog content and view performance metrics.',
+  });
 
   const handleSignOut = async () => {
     await signOut();

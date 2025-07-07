@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle, Lock, Download } from 'lucide-react';
 import { saveMarketingSubmission } from '../lib/localStorage';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,14 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  usePageMeta({
+    title: 'Free GEO Visibility Guide - Melny Results',
+    description: 'Get the no-BS guide that shows how to get your business recommended by ChatGPT, Google, Bing & Perplexity — before they hand your leads to a competitor.',
+    keywords: 'generative engine optimization, AI search, ChatGPT marketing, Google SGE, Bing AI, Perplexity optimization',
+    ogTitle: 'AI Just Changed the Way People Buy. Is Your Business Ready?',
+    ogDescription: 'Get your business recommended by ChatGPT, Google, Bing & Perplexity — before competitors take your leads.',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Mail, ArrowRight, Lock, Users, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { saveNewsletterSignup } from '../lib/localStorage';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const NewsletterPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,6 +12,14 @@ const NewsletterPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  usePageMeta({
+    title: 'Marketing Newsletter - Melny Results',
+    description: 'Get proven marketing strategies, sales training and demand generation tactics that actually work—delivered directly to your inbox.',
+    keywords: 'marketing newsletter, business growth tips, marketing strategies, email marketing, lead generation tactics',
+    ogTitle: 'THE Newsletter To Grow Your Business - Melny Results',
+    ogDescription: 'Just practical strategies used by expert marketers to grow any business.',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

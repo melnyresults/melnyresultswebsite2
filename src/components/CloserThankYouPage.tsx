@@ -2,11 +2,20 @@ import React, { useState } from 'react';
 import { Check, Menu, X as CloseIcon, Shield, ChevronLeft, ChevronRight, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const CloserThankYouPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const { posts } = useBlogPosts();
+  
+  usePageMeta({
+    title: 'Application Submitted - Closer Position - Melny Results',
+    description: 'Your application has been secured. If you\'re a real closer, you\'ll hear from us in the next 24–48 hours.',
+    keywords: 'application submitted, closer position, sales job, high ticket sales',
+    ogTitle: 'You\'re In. - Closer Application Submitted',
+    ogDescription: 'Your application has been secured. Check your email for available time slots.',
+  });
 
   const createSlug = (title: string, id: string) => {
     const slug = title

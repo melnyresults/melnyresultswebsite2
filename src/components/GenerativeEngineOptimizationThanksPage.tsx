@@ -1,8 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Lock, Mail, Play } from 'lucide-react';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const GenerativeEngineOptimizationThanksPage: React.FC = () => {
+  usePageMeta({
+    title: 'GEO Guide Sent - Check Your Inbox - Melny Results',
+    description: 'Your GEO Visibility Guide is on its way to your inbox. Watch the video to discover why 99% of businesses are invisible to AI search.',
+    keywords: 'GEO guide download, AI visibility audit, generative engine optimization, ChatGPT marketing',
+    ogTitle: 'Your GEO Visibility Guide Is On Its Way 📩',
+    ogDescription: 'Check your SPAM FOLDER. But before you go… this is where the real edge begins.',
+  });
+  
   return (
     <div className="min-h-screen bg-white">
       {/* Enhanced Hero Confirmation Block */}

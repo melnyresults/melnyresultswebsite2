@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Menu, X } from 'lucide-react';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const PrivacyPolicyPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  usePageMeta({
+    title: 'Cookie Policy - Melny Results',
+    description: 'Learn about how Melny Results uses cookies and tracking technologies on our website to improve your experience.',
+    keywords: 'cookie policy, privacy policy, website cookies, data protection',
+    ogTitle: 'Cookie Policy - Melny Results',
+    ogDescription: 'Information about cookies and tracking technologies used on our website.',
+  });
 
   return (
     <div className="min-h-screen bg-white">

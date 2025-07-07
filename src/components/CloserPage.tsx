@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, X, Menu, X as CloseIcon, Target, Flame, Rocket, Lock, Clock } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const CloserPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,6 +16,14 @@ const CloserPage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  
+  usePageMeta({
+    title: 'High-Ticket Closer Position - Melny Results',
+    description: 'We\'re hiring 1 high-ticket closer to handle 10-30 pre-booked calls a week, selling marketing services from $2K to $30K/month.',
+    keywords: 'sales job, closer position, high ticket sales, commission only, remote sales job',
+    ogTitle: 'You\'re Either a Closer... Or You\'re Pretending.',
+    ogDescription: 'No cold calling. No base pay. No tire kickers. Just red-hot leads... and fat commission.',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
