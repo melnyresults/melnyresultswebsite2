@@ -1,5 +1,18 @@
 import { useState, useEffect } from 'react';
-import { 
+import { supabase } from '../lib/supabase';
+
+export type BlogPost = {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  author: string;
+  published_at: string;
+  created_at: string;
+  updated_at: string;
+  image_url?: string;
+  likes_count: number;
+};
   BlogPost, 
   getBlogPosts, 
   createBlogPost as createPost, 
