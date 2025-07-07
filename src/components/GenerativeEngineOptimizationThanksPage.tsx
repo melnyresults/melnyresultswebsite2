@@ -99,15 +99,6 @@ const GenerativeEngineOptimizationThanksPage: React.FC = () => {
 
             {/* Price and Stripe Button */}
             <div className="mb-8">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Get My GEO Audit Now
-                </h3>
-                <div className="text-4xl font-bold text-gray-900">
-                  $997
-                </div>
-              </div>
-
               {/* Stripe Payment Button */}
               <div className="flex justify-center">
                 <div className="stripe-button-container">
