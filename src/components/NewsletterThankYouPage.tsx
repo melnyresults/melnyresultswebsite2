@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X as CloseIcon, CheckCircle, Mail, ArrowRight, Linkedin } from 'lucide-react';
+import { Menu, X as CloseIcon, CheckCircle, Mail, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 
