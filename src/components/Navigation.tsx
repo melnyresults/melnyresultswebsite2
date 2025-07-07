@@ -42,6 +42,7 @@ const Navigation: React.FC = () => {
             <div className="hidden md:flex items-center space-x-8">
               <Link 
                 to="/" 
+                aria-label="Go to homepage"
                 className={`transition-colors duration-200 font-medium ${
                   isActivePage('/') 
                     ? 'text-primary-red' 
@@ -52,6 +53,7 @@ const Navigation: React.FC = () => {
               </Link>
               <Link 
                 to="/free-marketing-analysis" 
+                aria-label="Get free marketing analysis"
                 className={`transition-colors duration-200 font-medium ${
                   isActivePage('/free-marketing-analysis') 
                     ? 'text-primary-red' 
@@ -62,6 +64,7 @@ const Navigation: React.FC = () => {
               </Link>
               <Link 
                 to="/blog" 
+                aria-label="Read our marketing blog"
                 className={`transition-colors duration-200 font-medium ${
                   isActivePage('/blog') 
                     ? 'text-primary-red' 
@@ -72,6 +75,7 @@ const Navigation: React.FC = () => {
               </Link>
               <Link 
                 to="/newsletter" 
+                aria-label="Subscribe to our newsletter"
                 className={`transition-colors duration-200 font-medium ${
                   isActivePage('/newsletter') 
                     ? 'text-primary-red' 
@@ -88,6 +92,8 @@ const Navigation: React.FC = () => {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-primary-blue focus:outline-none"
+              aria-label="Toggle mobile menu"
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>

@@ -20,8 +20,9 @@ const Footer: React.FC = () => {
           <div className="mt-8">
             <img 
               src="/src/assets/image (10).png" 
-              alt="Melny Results Logo" 
+              alt="Melny Results - Marketing Agency Logo" 
               className="h-48 w-auto mx-auto"
+              loading="lazy"
             />
           </div>
         </div>
