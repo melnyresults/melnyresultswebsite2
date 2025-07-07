@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
@@ -38,7 +38,38 @@ function ScrollToTop() {
   return null;
 }
 
+// Scroll animation hook
+function useScrollAnimation() {
+  useEffect(() => {
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    // Observe all sections
+    const sections = document.querySelectorAll('section');
+    sections.forEach((section) => {
+      section.classList.add('animate-on-scroll');
+      observer.observe(section);
+    });
+
+    return () => {
+      sections.forEach((section) => observer.unobserve(section));
+    };
+  }, []);
+}
+
 function HomePage() {
+  useScrollAnimation();
+  
   return (
     <div className="min-h-screen bg-white">
       <Navigation />

@@ -3,14 +3,15 @@ import { AlertTriangle } from 'lucide-react';
 
 const ValueProposition: React.FC = () => {
   return (
-    <section className="py-32 bg-gray-50">
+    <section className="py-40 bg-red-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="animate-slide-up">
-          <div className="flex justify-center mb-6">
-            <AlertTriangle className="w-12 h-12 text-primary-red" />
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-1 h-16 bg-primary-red mr-6"></div>
+            <AlertTriangle className="w-14 h-14 text-primary-red" />
           </div>
           
-          <h2 className="text-4xl font-bold text-gray-900 mb-8">
+          <h2 className="text-4xl font-semibold text-gray-900 mb-8">
             You've tried agencies, freelancers, DIY ads..
           </h2>
           

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,10 +24,14 @@ const Navigation: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const isActivePage = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-white ${
       isScrolled 
-        ? 'shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm' 
+        ? 'shadow-[0_8px_30px_rgb(0,0,0,0.15)] backdrop-blur-sm' 
         : 'shadow-[0_4px_20px_rgb(0,0,0,0.08)]'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,16 +40,44 @@ const Navigation: React.FC = () => {
           <div className="flex items-center space-x-12">
             {/* Navigation Links - Desktop */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+              <Link 
+                to="/" 
+                className={`transition-colors duration-200 font-medium ${
+                  isActivePage('/') 
+                    ? 'text-primary-red' 
+                    : 'text-gray-900 hover:text-primary-blue'
+                }`}
+              >
                 Home
               </Link>
-              <Link to="/free-marketing-analysis" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+              <Link 
+                to="/free-marketing-analysis" 
+                className={`transition-colors duration-200 font-medium ${
+                  isActivePage('/free-marketing-analysis') 
+                    ? 'text-primary-red' 
+                    : 'text-gray-900 hover:text-primary-blue'
+                }`}
+              >
                 Free Marketing Analysis
               </Link>
-              <Link to="/blog" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+              <Link 
+                to="/blog" 
+                className={`transition-colors duration-200 font-medium ${
+                  isActivePage('/blog') 
+                    ? 'text-primary-red' 
+                    : 'text-gray-900 hover:text-primary-blue'
+                }`}
+              >
                 Blog
               </Link>
-              <Link to="/newsletter" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+              <Link 
+                to="/newsletter" 
+                className={`transition-colors duration-200 font-medium ${
+                  isActivePage('/newsletter') 
+                    ? 'text-primary-red' 
+                    : 'text-gray-900 hover:text-primary-blue'
+                }`}
+              >
                 Newsletter
               </Link>
             </div>
