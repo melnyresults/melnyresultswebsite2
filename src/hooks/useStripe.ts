@@ -33,27 +33,8 @@ export const useStripe = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          price_id: priceId,
-          mode,
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-
-      const data: CheckoutSessionResponse = await response.json();
-      return data;
+      // Since Supabase functions are no longer available, return an error
+      throw new Error('Stripe checkout is not available without a backend service');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);

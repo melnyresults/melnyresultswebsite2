@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 
 interface Subscription {
@@ -43,13 +42,8 @@ export const useSubscription = () => {
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('*')
-        .maybeSingle();
-
-      if (error) throw error;
-      setSubscription(data);
+      // Since Supabase is no longer available, return null subscription
+      setSubscription(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -64,13 +58,8 @@ export const useSubscription = () => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('stripe_user_orders')
-        .select('*')
-        .order('order_date', { ascending: false });
-
-      if (error) throw error;
-      setOrders(data || []);
+      // Since Supabase is no longer available, return empty orders
+      setOrders([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }

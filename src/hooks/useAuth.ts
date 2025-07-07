@@ -1,40 +1,45 @@
 import { useState, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { authenticateUser, getCurrentUser, signOutUser } from '../lib/localStorage';
+
+// Local User type since we're not using Supabase
+interface User {
+  id: string;
+  email: string;
+}
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    // Get current user from localStorage
+    const currentUser = getCurrentUser();
+    setUser(currentUser);
+    setLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { data, error };
+    try {
+      const result = authenticateUser(email, password);
+      if (result.success && result.user) {
+        setUser(result.user);
+        return { data: { user: result.user }, error: null };
+      } else {
+        return { data: null, error: { message: result.error || 'Authentication failed' } };
+      }
+    } catch (error) {
+      return { data: null, error: { message: 'Authentication failed' } };
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    return { error };
+    try {
+      signOutUser();
+      setUser(null);
+      return { error: null };
+    } catch (error) {
+      return { error: { message: 'Sign out failed' } };
+    }
   };
 
   return {

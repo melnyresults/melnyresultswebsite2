@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Eye, EyeOff, UserPlus } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 const SignupPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -43,23 +42,9 @@ const SignupPage: React.FC = () => {
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/admin/dashboard`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
-    } else if (data.user) {
-      setSuccess(true);
-      // Redirect to login page after successful signup
-      setTimeout(() => {
-        navigate('/admin/login');
-      }, 2000);
-    }
+    // Since we're using localStorage and don't have a backend signup system,
+    // we'll show an error message indicating signup is not available
+    setError('User registration is not available without a backend service. Please contact the administrator.');
 
     setLoading(false);
   };

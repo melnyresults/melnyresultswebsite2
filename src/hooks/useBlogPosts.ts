@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 
 export type BlogPost = {
   id: string;

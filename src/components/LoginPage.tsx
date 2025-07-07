@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Eye, EyeOff, LogIn } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 
 const LoginPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,6 +14,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,10 +29,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: formData.email,
-      password: formData.password,
-    });
+    const { data, error } = await signIn(formData.email, formData.password);
 
     if (error) {
       setError(error.message);
