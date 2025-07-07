@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
             <img 
               src="/src/assets/image (10).png" 
               alt="Melny Results Logo" 
-              className="h-24 w-auto mx-auto"
+              className="h-40 w-auto mx-auto"
             />
           </div>
         </div>
