@@ -1,6 +1,24 @@
 import React from 'react';
+import { useState } from 'react';
+import { handleGEOAuditCheckout } from '../lib/stripe';
 
 const GenerativeEngineOptimizationThanksPage: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await handleGEOAuditCheckout();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Section 1: Confirmation Message */}
@@ -101,14 +119,31 @@ const GenerativeEngineOptimizationThanksPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Stripe Payment Button Placeholder */}
-              <div className="bg-gray-100 p-8 rounded-lg border-2 border-dashed border-gray-300 text-center">
-                <p className="text-gray-600 font-medium">
-                  👉 Paste Stripe embed code here
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Replace this placeholder with your Stripe payment button
-                </p>
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Stripe Checkout Button */}
+              <button
+                onClick={handleCheckout}
+                disabled={isLoading}
+                className="w-full bg-primary-red text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  'Get My GEO Audit Now - $997'
+                )}
+              </button>
+
+              <p className="text-sm text-gray-500 mt-4">
+                Secure payment powered by Stripe
               </div>
             </div>
           </div>
