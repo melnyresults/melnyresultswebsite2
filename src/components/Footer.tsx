@@ -15,6 +15,15 @@ const Footer: React.FC = () => {
               Cookies + Privacy
             </Link>
           </div>
+          
+          {/* Logo */}
+          <div className="mt-8">
+            <img 
+              src="/src/assets/image (10).png" 
+              alt="Melny Results Logo" 
+              className="h-24 w-auto mx-auto"
+            />
+          </div>
         </div>
       </div>
     </footer>
