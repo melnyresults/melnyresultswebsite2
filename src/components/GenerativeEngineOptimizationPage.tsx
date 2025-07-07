@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Lock, Download, Brain } from 'lucide-react';
 import { saveMarketingSubmission } from '../lib/localStorage';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
@@ -67,7 +67,7 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       });
       
       // Redirect to thank you page
-      navigate('/thankyou-consult');
+      navigate('/generative-engine-optimization-guide-thanks');
     } catch (err) {
       console.error('Form submission error:', err);
       setError('There was an error submitting your request. Please try again.');
@@ -78,103 +78,126 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Main Content - Takes full height minus footer */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+      {/* Enhanced Hero Section with Gradient Background */}
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-2xl mx-auto text-center w-full">
           <div className="animate-slide-up">
-            {/* Free Guide Badge */}
-            <div className="inline-flex items-center px-4 py-2 bg-primary-red text-white rounded-full text-sm font-semibold mb-8">
+            {/* Enhanced Free Guide Badge */}
+            <div className="inline-flex items-center px-6 py-3 bg-primary-red text-white rounded-full text-sm font-semibold mb-8 shadow-lg">
               Free Guide
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-              AI Just Changed the Way People Buy.<br />
-              <span className="text-primary-red">Is Your Business Still Playing by the Old Rules?</span>
-            </h1>
+            {/* Enhanced Main Headline with AI Icon */}
+            <div className="flex items-start justify-center gap-4 mb-8">
+              <div className="flex-shrink-0 mt-2">
+                <Brain className="w-12 h-12 text-primary-blue" />
+              </div>
+              <div className="flex-1">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+                  AI Just Changed the Way People Buy.<br />
+                  <span className="text-primary-red relative">
+                    Is Your Business Still Playing by the Old Rules?
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-red mt-2"></div>
+                  </span>
+                </h1>
+              </div>
+            </div>
             
-            {/* Subheadline */}
-            <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
+            {/* Enhanced Subheadline */}
+            <p className="text-2xl text-gray-600 leading-relaxed mb-8 max-w-3xl mx-auto font-medium">
               Get the no-BS guide that shows how to get your business recommended by ChatGPT, Google, Bing & Perplexity — before they hand your leads to a competitor.
             </p>
 
-            {/* Form */}
-            <div className="max-w-md mx-auto">
-              {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600">{error}</p>
-                </div>
-              )}
+            {/* Privacy Microcopy */}
+            <div className="flex items-center justify-center gap-2 mb-12 text-gray-500">
+              <Lock className="w-4 h-4" />
+              <span className="text-sm">Your details stay private—no spam, ever.</span>
+            </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Email Field */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
-                    placeholder="your@email.com"
+            {/* Enhanced Form Card */}
+            <div className="max-w-md mx-auto animate-fade-in-up">
+              <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                {error && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-600">{error}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Enhanced Email Field */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                      placeholder="your@email.com"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  {/* Enhanced Phone Field */}
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      required
+                      value={formData.phone}
+                      onChange={handlePhoneChange}
+                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                      placeholder="+1 (555) 123-4567"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  {/* Enhanced Submit Button */}
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
-                  />
-                </div>
+                    className="w-full bg-primary-red text-white px-8 py-5 rounded-lg text-lg font-semibold hover:bg-red-800 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-5 h-5" />
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        Sending Your Guide...
+                      </div>
+                    ) : (
+                      'Get My Free Guide Now'
+                    )}
+                  </button>
+                </form>
+              </div>
 
-                {/* Phone Field */}
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    required
-                    value={formData.phone}
-                    onChange={handlePhoneChange}
-                    className="w-full px-4 py-4 bg-gray-100 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
-                    placeholder="+1 (555) 123-4567"
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-primary-red text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Sending Your Guide...
+              {/* Enhanced Trust Bar */}
+              <div className="mt-8 animate-fade-in-up">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-100 border-t-2 border-t-gray-200">
+                  <div className="flex justify-center items-center gap-8 py-6 px-4 flex-wrap">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="font-medium">Instant download</span>
                     </div>
-                  ) : (
-                    'Get My Free Guide Now'
-                  )}
-                </button>
-
-                {/* Trust Elements */}
-                <div className="flex justify-center items-center gap-6 pt-6 border-t border-gray-100 flex-wrap">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Instant download</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>No spam</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>100% free</span>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="font-medium">No spam</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="font-medium">100% free</span>
+                    </div>
                   </div>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
