@@ -22,7 +22,6 @@ import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
 import GenerativeEngineOptimizationPage from './components/GenerativeEngineOptimizationPage';
 import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngineOptimizationThanksPage';
-import GEOAuditSuccessPage from './components/GEOAuditSuccessPage';
 
 // Component to handle scroll to top on route change
 function ScrollToTop() {
@@ -71,7 +70,6 @@ function App() {
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/generative-engine-optimization-guide" element={<GenerativeEngineOptimizationPage />} />
         <Route path="/generative-engine-optimization-guide-thanks" element={<GenerativeEngineOptimizationThanksPage />} />
-        <Route path="/geo-audit-success" element={<GEOAuditSuccessPage />} />
         <Route 
           path="/admin/dashboard" 
           element={
