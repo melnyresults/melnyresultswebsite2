@@ -17,6 +17,10 @@ import ThankYouConsultPage from './components/ThankYouConsultPage';
 import NewsletterPage from './components/NewsletterPage';
 import NewsletterThankYouPage from './components/NewsletterThankYouPage';
 import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
+import ProductsPage from './components/ProductsPage';
+import SuccessPage from './components/SuccessPage';
+import CancelPage from './components/CancelPage';
 import AdminDashboard from './components/AdminDashboard';
 import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -66,6 +70,10 @@ function App() {
         <Route path="/newsletter" element={<NewsletterPage />} />
         <Route path="/newsletter/thank-you" element={<NewsletterThankYouPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
+        <Route path="/admin/signup" element={<SignupPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/success" element={<SuccessPage />} />
+        <Route path="/cancel" element={<CancelPage />} />
         <Route 
           path="/admin/dashboard" 
           element={

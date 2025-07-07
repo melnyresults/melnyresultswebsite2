@@ -47,6 +47,16 @@ const Navigation: React.FC = () => {
               <Link to="/newsletter" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
                 Newsletter
               </Link>
+              <Link
+                to="/products"
+                className="block px-3 py-2 text-gray-900 hover:text-primary-blue w-full text-left font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Products
+              </Link>
+              <Link to="/products" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+                Products
+              </Link>
             </div>
           </div>
 
