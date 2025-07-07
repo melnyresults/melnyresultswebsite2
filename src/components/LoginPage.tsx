@@ -147,7 +147,7 @@ const LoginPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
-                  placeholder="admin@melnyresults.com"
+                  placeholder="ivan@melnyresults.com"
                 />
               </div>
 

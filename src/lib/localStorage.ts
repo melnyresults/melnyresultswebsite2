@@ -153,7 +153,7 @@ export const saveNewsletterSignup = (email: string): { success: boolean; error?:
 // Simple authentication
 export const authenticateUser = (email: string, password: string): { success: boolean; error?: string } => {
   // Simple hardcoded authentication - replace with your preferred method
-  if (email === 'admin@melnyresults.com' && password === 'admin123') {
+  if (email === 'ivan@melnyresults.com' && password === 'admin123') {
     localStorage.setItem('auth_user', JSON.stringify({ email, authenticated: true }));
     return { success: true };
   }
