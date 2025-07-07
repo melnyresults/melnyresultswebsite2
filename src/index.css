@@ -18,3 +18,15 @@ html {
 input, textarea, select, button {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
 }
+
+/* Stripe Button Styling */
+.stripe-button-container {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Ensure Stripe button inherits proper styling */
+stripe-buy-button {
+  width: 100%;
+  display: block;
+}
