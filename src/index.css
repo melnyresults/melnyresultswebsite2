@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth scrolling for the entire document */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure smooth transitions for page changes */
+* {
+  transition-property: opacity, transform;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+}
+
+/* Override transition for specific elements that shouldn't have it */
+input, textarea, select, button {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+}
