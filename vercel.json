@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/create-checkout-session.js": {
+      "maxDuration": 10
+    },
+    "api/stripe-webhook.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "STRIPE_SECRET_KEY": "@stripe_secret_key",
+    "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret"
+  }
+}
