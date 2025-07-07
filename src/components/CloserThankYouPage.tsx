@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Check, Menu, X as CloseIcon } from 'lucide-react';
+import { Check, Menu, X as CloseIcon, Shield, ChevronLeft, ChevronRight, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 
 const CloserThankYouPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const { posts } = useBlogPosts();
 
   const createSlug = (title: string, id: string) => {
@@ -15,8 +16,44 @@ const CloserThankYouPage: React.FC = () => {
     return `${slug}-${id.slice(0, 8)}`;
   };
 
-  // Get the first 3 blog posts for display
-  const displayPosts = posts.slice(0, 3);
+  // Get blog posts for carousel
+  const displayPosts = posts.length > 0 ? posts.slice(0, 6) : [
+    {
+      id: '1',
+      title: "Smart Small > Big Dumb",
+      excerpt: "Why smart, targeted campaigns always outperform massive, unfocused marketing efforts.",
+      image_url: "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop"
+    },
+    {
+      id: '2',
+      title: "Easy Problem Fixer",
+      excerpt: "How to position yourself as the go-to solution for problems customers don't know they have.",
+      image_url: "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop"
+    },
+    {
+      id: '3',
+      title: "Do Less",
+      excerpt: "Why focusing on fewer things will actually grow your business faster than trying to do everything.",
+      image_url: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop"
+    }
+  ];
+
+  const getRandomCategory = () => {
+    const categories = ['Growth Strategies', 'Success Stories', 'Tips', 'Case Studies'];
+    return categories[Math.floor(Math.random() * categories.length)];
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % Math.ceil(displayPosts.length / 3));
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + Math.ceil(displayPosts.length / 3)) % Math.ceil(displayPosts.length / 3));
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -88,128 +125,154 @@ const CloserThankYouPage: React.FC = () => {
         )}
       </nav>
 
-      {/* Thank You Section */}
-      <section className="py-32 bg-white">
+      {/* Enhanced Hero Confirmation Block */}
+      <section className="py-20 bg-green-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Green Checkmark */}
-          <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 bg-green-500 rounded-lg flex items-center justify-center">
-              <Check className="w-12 h-12 text-white" strokeWidth={3} />
+          <div className="animate-fade-in-up">
+            {/* Animated Green Checkmark */}
+            <div className="flex justify-center mb-8">
+              <div className="w-24 h-24 bg-green-500 rounded-lg flex items-center justify-center animate-bounce">
+                <Check className="w-14 h-14 text-white" strokeWidth={3} />
+              </div>
             </div>
-          </div>
 
-          {/* Main Headline */}
-          <h1 className="text-6xl font-bold text-gray-900 mb-12">
-            You're In.
-          </h1>
+            {/* Enhanced Main Headline */}
+            <h1 className="text-6xl lg:text-7xl font-bold text-gray-900 mb-8">
+              You're In.
+            </h1>
 
-          {/* Confirmation Message */}
-          <div className="max-w-2xl mx-auto text-lg text-gray-700">
-            <p>
-              If you're a real closer, you'll hear from us in the next <strong>24–48 hours</strong>. 
-              Check your email for available time slots. If not? Someone else will take your spot.
-            </p>
+            {/* Enhanced Subheadline with Shield Icon */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Shield className="w-6 h-6 text-green-500" />
+                <p className="text-xl text-gray-700 leading-relaxed font-medium">
+                  Your application has been secured.
+                </p>
+              </div>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                If you're a real closer, you'll hear from us in the next <strong>24–48 hours</strong>. 
+                Check your email for available time slots. If not? Someone else will take your spot.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Blog Posts Section */}
+      {/* Enhanced Blog Carousel Section */}
       <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {displayPosts.length > 0 ? (
-            <>
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  While You Wait, Check Out Our Latest Insights
-                </h2>
-                <p className="text-gray-600">
-                  Learn more about sales, marketing, and business growth
-                </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-fade-in-up">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                🔥 Keep Your Edge — Read Our Top Insights
+              </h2>
+              <p className="text-xl text-gray-600">
+                Grow your skills while you wait for your call.
+              </p>
+            </div>
+
+            {/* Blog Carousel */}
+            <div className="relative">
+              {/* Navigation Arrows - Desktop */}
+              <div className="hidden md:block">
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  disabled={displayPosts.length <= 3}
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  disabled={displayPosts.length <= 3}
+                >
+                  <ChevronRight className="w-6 h-6 text-gray-600" />
+                </button>
               </div>
-              <div className="grid md:grid-cols-3 gap-8">
-                {displayPosts.map((post) => (
-                  <Link 
-                    key={post.id} 
-                    to={`/blog/${createSlug(post.title, post.id)}`}
-                    className="group cursor-pointer"
-                  >
-                    <div className="relative overflow-hidden rounded-lg bg-black">
-                      <img 
-                        src={post.image_url || 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'}
-                        alt={post.title}
-                        className="w-full h-64 object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300"
-                      />
-                      <div className="absolute inset-0 flex flex-col justify-between p-6">
-                        <div className="text-gray-400 text-sm font-medium">
-                          MELNYRESULTS.COM
-                        </div>
-                        <div>
-                          <h3 className="text-white text-2xl font-bold leading-tight group-hover:text-primary-blue transition-colors duration-300">
-                            {post.title}
-                          </h3>
-                          {post.excerpt && (
-                            <p className="text-gray-300 text-sm mt-2 line-clamp-2">
-                              {post.excerpt}
-                            </p>
-                          )}
-                        </div>
+
+              {/* Carousel Container */}
+              <div className="overflow-hidden">
+                <div 
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {Array.from({ length: Math.ceil(displayPosts.length / 3) }).map((_, slideIndex) => (
+                    <div key={slideIndex} className="w-full flex-shrink-0">
+                      <div className="grid md:grid-cols-3 gap-8 px-4">
+                        {displayPosts.slice(slideIndex * 3, (slideIndex + 1) * 3).map((post, index) => (
+                          <Link 
+                            key={post.id || index} 
+                            to={posts.length > 0 ? `/blog/${createSlug(post.title, post.id)}` : '/blog'}
+                            className="group cursor-pointer"
+                          >
+                            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden h-full">
+                              {/* Enhanced Featured Image */}
+                              <div className="relative overflow-hidden">
+                                <img 
+                                  src={post.image_url || 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'}
+                                  alt={post.title}
+                                  className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
+                                />
+                                {/* Category Badge */}
+                                <div className="absolute top-4 left-4">
+                                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary-red text-white">
+                                    <Tag className="w-3 h-3 mr-1" />
+                                    {getRandomCategory()}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Enhanced Content */}
+                              <div className="p-8">
+                                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-primary-blue transition-colors duration-300">
+                                  {post.title}
+                                </h3>
+                                <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed">
+                                  {post.excerpt || "Discover proven strategies to grow your business faster."}
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
                     </div>
-                  </Link>
-                ))}
+                  ))}
+                </div>
               </div>
+
+              {/* Mobile Swipe Indicator */}
+              <div className="md:hidden mt-6 text-center text-sm text-gray-500">
+                Swipe to see more →
+              </div>
+
+              {/* Pagination Dots */}
+              {displayPosts.length > 3 && (
+                <div className="flex justify-center mt-8 space-x-2">
+                  {Array.from({ length: Math.ceil(displayPosts.length / 3) }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                        currentSlide === index ? 'bg-primary-red' : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* View All Blog Posts CTA */}
               <div className="text-center mt-12">
                 <Link
                   to="/blog"
-                  className="inline-flex items-center px-6 py-3 bg-primary-red text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  className="inline-flex items-center px-8 py-4 bg-primary-red text-white rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl"
                 >
-                  View All Blog Posts
+                  View All Insights
                 </Link>
               </div>
-            </>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Fallback static posts if no blog posts exist */}
-              {[
-                {
-                  title: "Smart Small > Big Dumb",
-                  image: "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop"
-                },
-                {
-                  title: "Easy Problem Fixer",
-                  image: "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop"
-                },
-                {
-                  title: "Do Less",
-                  image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop"
-                }
-              ].map((post, index) => (
-                <Link 
-                  key={index} 
-                  to="/blog"
-                  className="group cursor-pointer"
-                >
-                  <div className="relative overflow-hidden rounded-lg bg-black">
-                    <img 
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-64 object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300"
-                    />
-                    <div className="absolute inset-0 flex flex-col justify-between p-6">
-                      <div className="text-gray-400 text-sm font-medium">
-                        MELNYRESULTS.COM
-                      </div>
-                      <div>
-                        <h3 className="text-white text-2xl font-bold leading-tight group-hover:text-primary-blue transition-colors duration-300">
-                          {post.title}
-                        </h3>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
             </div>
-          )}
+          </div>
         </div>
       </section>
 
