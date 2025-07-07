@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import premium font weights */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap');
+/* Import Inter font weights */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* Smooth scrolling for the entire document */
 html {
   scroll-behavior: smooth;
-  font-family: 'Open Sans', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 /* Ensure smooth transitions for page changes */
@@ -23,17 +23,10 @@ input, textarea, select, button {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
 }
 
-/* Headings use Poppins Bold */
+/* Headings use Inter SemiBold */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-weight: 700;
-  color: #222222;
-}
-
-/* Body text uses Open Sans */
-body, p, span, div {
-  font-family: 'Open Sans', system-ui, sans-serif;
-  color: #333333;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 600;
 }
 
 /* Fade in animation on scroll */

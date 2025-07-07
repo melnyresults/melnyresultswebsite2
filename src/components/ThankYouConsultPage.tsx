@@ -108,27 +108,27 @@ const ThankYouConsultPage: React.FC = () => {
       </nav>
 
       {/* Enhanced Hero Section */}
-      <section className="py-24 bg-green-50">
+      <section className="py-20 bg-green-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="animate-fade-in-up">
             {/* Animated Green Checkmark */}
             <div className="flex justify-center mb-8">
-              <div className="w-28 h-28 bg-green-500 rounded-lg flex items-center justify-center animate-bounce-soft">
-                <CheckCircle className="w-16 h-16 text-white" strokeWidth={3} />
+              <div className="w-24 h-24 bg-green-500 rounded-lg flex items-center justify-center animate-bounce">
+                <CheckCircle className="w-14 h-14 text-white" strokeWidth={3} />
               </div>
             </div>
 
             {/* Enhanced Main Headline */}
-            <h1 className="font-heading text-7xl lg:text-8xl font-bold text-gray-900 mb-10">
+            <h1 className="text-6xl lg:text-7xl font-bold text-gray-900 mb-8">
               Thanks for Signing Up!
             </h1>
 
             {/* Enhanced Subheadline */}
             <div className="max-w-2xl mx-auto mb-8">
-              <p className="font-body text-2xl text-gray-800 leading-relaxed mb-6 font-bold">
+              <p className="text-xl text-gray-700 leading-relaxed mb-4 font-medium">
                 We're analyzing your business right now—here's what to expect next.
               </p>
-              <p className="font-body text-lg text-gray-700 leading-relaxed font-medium">
+              <p className="text-lg text-gray-600 leading-relaxed">
                 Ivan will personally review your information and get in touch within 24 hours.
               </p>
             </div>
@@ -137,52 +137,52 @@ const ThankYouConsultPage: React.FC = () => {
       </section>
 
       {/* Enhanced Next Steps Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-fade-in-up">
             {/* Steps Grid */}
             <div className="grid md:grid-cols-3 gap-8">
               {/* Step 1 */}
-              <div className="text-center p-10 bg-white rounded-2xl shadow-premium border-r border-gray-200 md:border-r-2">
+              <div className="text-center p-8 bg-white rounded-2xl shadow-sm border-r border-gray-200 md:border-r-2">
                 <div className="flex justify-center mb-6">
-                  <div className="w-18 h-18 bg-navy-50 rounded-full flex items-center justify-center">
-                    <Mail className="w-10 h-10 text-navy-500" />
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Mail className="w-8 h-8 text-primary-blue" />
                   </div>
                 </div>
-                <h3 className="font-heading text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   📧 Step 1
                 </h3>
-                <p className="font-body text-gray-800 leading-relaxed font-medium">
+                <p className="text-gray-700 leading-relaxed">
                   <strong>Watch your email</strong>—your analysis arrives in 24 hours.
                 </p>
               </div>
 
               {/* Step 2 */}
-              <div className="text-center p-10 bg-white rounded-2xl shadow-premium border-r border-gray-200 md:border-r-2">
+              <div className="text-center p-8 bg-white rounded-2xl shadow-sm border-r border-gray-200 md:border-r-2">
                 <div className="flex justify-center mb-6">
-                  <div className="w-18 h-18 bg-green-50 rounded-full flex items-center justify-center">
-                    <FileText className="w-10 h-10 text-green-600" />
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                    <FileText className="w-8 h-8 text-green-600" />
                   </div>
                 </div>
-                <h3 className="font-heading text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   📝 Step 2
                 </h3>
-                <p className="font-body text-gray-800 leading-relaxed font-medium">
+                <p className="text-gray-700 leading-relaxed">
                   <strong>Review your custom growth plan</strong> tailored to your business.
                 </p>
               </div>
 
               {/* Step 3 */}
-              <div className="text-center p-10 bg-white rounded-2xl shadow-premium">
+              <div className="text-center p-8 bg-white rounded-2xl shadow-sm">
                 <div className="flex justify-center mb-6">
-                  <div className="w-18 h-18 bg-red-50 rounded-full flex items-center justify-center">
-                    <Phone className="w-10 h-10 text-primary-red" />
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                    <Phone className="w-8 h-8 text-primary-red" />
                   </div>
                 </div>
-                <h3 className="font-heading text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   📞 Step 3
                 </h3>
-                <p className="font-body text-gray-800 leading-relaxed font-medium">
+                <p className="text-gray-700 leading-relaxed">
                   <strong>Book your free strategy call</strong> (if you want help implementing).
                 </p>
               </div>
@@ -197,10 +197,10 @@ const ThankYouConsultPage: React.FC = () => {
           <div className="animate-fade-in-up">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <h2 className="font-heading text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
                 🎯 Get a Head Start While You Wait
               </h2>
-              <p className="font-body text-xl text-gray-700 font-medium">
+              <p className="text-xl text-gray-600">
                 Discover proven strategies to accelerate your growth
               </p>
             </div>
@@ -213,7 +213,7 @@ const ThankYouConsultPage: React.FC = () => {
                   to={posts.length > 0 ? `/blog/${createSlug(post.title, post.id)}` : '/blog'}
                   className="group cursor-pointer"
                 >
-                  <div className="bg-white rounded-2xl shadow-premium hover:shadow-premium-xl transition-all duration-300 hover:-translate-y-3 overflow-hidden h-full border border-gray-200">
+                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden h-full border border-gray-100">
                     {/* Thumbnail Image */}
                     <div className="relative overflow-hidden">
                       <img 
@@ -225,13 +225,13 @@ const ThankYouConsultPage: React.FC = () => {
 
                     {/* Content */}
                     <div className="p-6">
-                      <h3 className="font-heading text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-navy-500 transition-colors duration-300">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-primary-blue transition-colors duration-300">
                         {post.title}
                       </h3>
-                      <p className="font-body text-gray-700 text-sm line-clamp-2 leading-relaxed mb-4 font-medium">
+                      <p className="text-gray-600 text-sm line-clamp-2 leading-relaxed mb-4">
                         {post.excerpt || "Discover proven strategies to grow your business faster."}
                       </p>
-                      <div className="inline-flex items-center text-navy-500 font-bold group-hover:text-navy-600 transition-colors">
+                      <div className="inline-flex items-center text-primary-blue font-medium group-hover:text-blue-700 transition-colors">
                         Read Now
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -245,7 +245,7 @@ const ThankYouConsultPage: React.FC = () => {
             <div className="text-center">
               <Link
                 to="/blog"
-                className="inline-flex items-center px-12 py-6 bg-primary-red text-white rounded-lg text-lg font-heading font-bold uppercase tracking-cta hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-premium-lg hover:shadow-premium-xl min-h-[56px]"
+                className="inline-flex items-center px-8 py-4 bg-primary-red text-white rounded-lg text-lg font-semibold hover:bg-red-800 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl"
               >
                 <Target className="w-5 h-5 mr-2" />
                 Explore All Resources

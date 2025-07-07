@@ -23,7 +23,7 @@ const TestimonialsSection: React.FC = () => {
     <section id="testimonials" className="py-40 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="font-heading text-5xl font-bold text-gray-900 mb-8">
+          <h2 className="text-4xl font-semibold text-gray-900 mb-8">
             Real Results from Real Clients
           </h2>
         </div>
@@ -32,10 +32,10 @@ const TestimonialsSection: React.FC = () => {
           {testimonials.map((testimonial, index) => (
             <div 
               key={index}
-              className="bg-white p-10 rounded-2xl shadow-premium hover:shadow-premium-xl transition-all duration-300 relative border-t-4 border-navy-500"
+              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 relative border-t-4 border-primary-blue"
             >
               <div className="absolute top-6 right-6">
-                <Quote className="w-10 h-10 text-navy-500 opacity-20" />
+                <Quote className="w-8 h-8 text-primary-blue opacity-20" />
               </div>
               
               <div className="flex mb-4">
@@ -44,17 +44,17 @@ const TestimonialsSection: React.FC = () => {
                 ))}
               </div>
               
-              <blockquote className="font-body text-xl text-gray-800 mb-8 italic leading-relaxed font-medium">
+              <blockquote className="text-lg text-gray-700 mb-6 italic leading-relaxed">
                 "{testimonial.quote}"
               </blockquote>
               
               <div className="flex items-center">
-                <div className="w-14 h-14 bg-navy-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
                   {testimonial.avatar}
                 </div>
                 <div>
-                  <div className="font-heading font-bold text-gray-900">{testimonial.author}</div>
-                  <div className="font-body text-gray-600 text-sm">{testimonial.role}</div>
+                  <div className="font-semibold text-gray-900">{testimonial.author}</div>
+                  <div className="text-gray-600 text-sm">{testimonial.role}</div>
                 </div>
               </div>
             </div>
