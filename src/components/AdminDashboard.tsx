@@ -63,7 +63,7 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <Link to="/">
                 <img 
-                  src="/src/assets/Pi7_97df89_95841abeaee8492d9a125d32fab0e3fb~mv2 copy.png" 
+                  src="/melny-results-logo.png" 
                   alt="Melny Results Logo" 
                   className="h-8 w-auto"
                 />

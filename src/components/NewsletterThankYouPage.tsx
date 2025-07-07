@@ -250,7 +250,7 @@ const NewsletterThankYouPage: React.FC = () => {
             {/* Enhanced Logo Section */}
             <div>
               <img 
-                src="/src/assets/image (10).png" 
+                src="/melny-results-logo.png" 
                 alt="Melny Results Logo" 
                 className="h-48 w-auto mx-auto"
               />
