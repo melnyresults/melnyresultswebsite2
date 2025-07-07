@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CheckCircle, Lock, Download, Brain } from 'lucide-react';
+import { CheckCircle, Lock, Download } from 'lucide-react';
 import { saveMarketingSubmission } from '../lib/localStorage';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
@@ -88,20 +88,13 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
             </div>
 
             {/* Enhanced Main Headline with AI Icon */}
-            <div className="flex items-start justify-center gap-4 mb-8">
-              <div className="flex-shrink-0 mt-2">
-                <Brain className="w-12 h-12 text-primary-blue" />
-              </div>
-              <div className="flex-1">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
-                  AI Just Changed the Way People Buy.<br />
-                  <span className="text-primary-red relative">
-                    Is Your Business Still Playing by the Old Rules?
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-red mt-2"></div>
-                  </span>
-                </h1>
-              </div>
-            </div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-8">
+              AI Just Changed the Way People Buy.<br />
+              <span className="text-primary-red relative">
+                Is Your Business Still Playing by the Old Rules?
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-red mt-2"></div>
+              </span>
+            </h1>
             
             {/* Enhanced Subheadline */}
             <p className="text-2xl text-gray-600 leading-relaxed mb-8 max-w-3xl mx-auto font-medium">
