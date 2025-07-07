@@ -239,8 +239,9 @@ const PostEditor: React.FC = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 text-2xl font-semibold border-0 focus:ring-0 focus:outline-none resize-none"
                   placeholder="Enter your post title..."
+                  aria-describedby="title-help"
                 />
-                <div className="mt-2 text-sm text-gray-500">
+                <div id="title-help" className="mt-2 text-sm text-gray-500">
                   {formData.title.length}/60 characters (optimal for SEO)
                 </div>
               </div>
@@ -415,8 +416,9 @@ const PostEditor: React.FC = () => {
                 <div className="mt-4">
                   <img
                     src={formData.image_url}
-                    alt="Featured image preview"
+                    alt={`Featured image preview for: ${formData.title || 'new blog post'}`}
                     className="w-full h-32 object-cover rounded-lg"
+                    loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
