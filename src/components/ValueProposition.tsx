@@ -6,8 +6,7 @@ const ValueProposition: React.FC = () => {
     <section className="py-40 bg-red-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="animate-slide-up">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-1 h-16 bg-primary-red mr-6"></div>
+          <div className="flex justify-center mb-6">
             <AlertTriangle className="w-14 h-14 text-primary-red" />
           </div>
           

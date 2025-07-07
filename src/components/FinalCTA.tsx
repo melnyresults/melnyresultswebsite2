@@ -40,12 +40,12 @@ const FinalCTA: React.FC = () => {
         {/* Centered box */}
         <div className="max-w-2xl mx-auto">
           <div className="bg-gray-50 p-8 rounded-2xl">
-            <h4 className="text-2xl font-semibold text-gray-900 mb-6">
+            <h4 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
               Most Agencies Sell You Dreams.{' '}
               <span className="text-primary-blue">We Hand You The Map.</span>
             </h4>
             
-            <div className="space-y-4 mb-8">
+            <div className="space-y-4 mb-8 text-left">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <CheckCircle className="w-6 h-6 text-green-500 mt-0.5 flex-shrink-0" />
@@ -54,12 +54,14 @@ const FinalCTA: React.FC = () => {
               ))}
             </div>
             
-            <Link
-              to="/free-marketing-analysis"
-              className="w-full md:w-auto md:inline-block bg-primary-red text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl mb-4 text-center"
-            >
-              Get My Free Growth Plan Now
-            </Link>
+            <div className="text-center mb-4">
+              <Link
+                to="/free-marketing-analysis"
+                className="inline-block bg-primary-red text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl w-full md:w-auto"
+              >
+                Get My Free Growth Plan Now
+              </Link>
+            </div>
             
             <p className="text-sm text-gray-500 text-center flex items-center justify-center gap-2 flex-wrap">
               <Lock className="w-4 h-4" />

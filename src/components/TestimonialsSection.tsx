@@ -34,18 +34,11 @@ const TestimonialsSection: React.FC = () => {
               key={index}
               className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 relative border-t-4 border-primary-blue"
             >
-              {/* Client Avatar */}
-              <div className="absolute top-6 left-6">
-                <div className="w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  {testimonial.avatar}
-                </div>
-              </div>
-              
               <div className="absolute top-6 right-6">
                 <Quote className="w-8 h-8 text-primary-blue opacity-20" />
               </div>
               
-              <div className="flex mb-4 mt-8">
+              <div className="flex mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
                 ))}
@@ -55,7 +48,10 @@ const TestimonialsSection: React.FC = () => {
                 "{testimonial.quote}"
               </blockquote>
               
-              <div className="ml-16">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  {testimonial.avatar}
+                </div>
                 <div>
                   <div className="font-semibold text-gray-900">{testimonial.author}</div>
                   <div className="text-gray-600 text-sm">{testimonial.role}</div>
