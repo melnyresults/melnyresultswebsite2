@@ -13,11 +13,13 @@ export interface CheckoutSessionData {
 
 export const createCheckoutSession = async (data: CheckoutSessionData) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
+    // Use your deployed API endpoint instead of Supabase
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    
+    const response = await fetch(`${apiUrl}/api/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify(data),
     });
