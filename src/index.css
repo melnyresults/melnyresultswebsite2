@@ -52,3 +52,40 @@ stripe-buy-button {
   width: 100%;
   display: block;
 }
+
+/* Blog specific styles */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Prose styling for blog content */
+.prose blockquote {
+  border-left: 4px solid #004080;
+  background-color: #f1f6fb;
+  padding: 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  font-style: italic;
+  margin: 2rem 0;
+}
+
+.prose h2, .prose h3 {
+  scroll-margin-top: 6rem;
+}
+
+/* Table of contents active state */
+.toc-active {
+  color: #004080;
+  font-weight: 600;
+}
