@@ -14,11 +14,10 @@ export interface CheckoutSessionData {
 
 export const createCheckoutSession = async (data: CheckoutSessionData) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
+    const response = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify(data),
     });
@@ -54,6 +53,7 @@ export const handleGEOAuditCheckout = async (customerEmail?: string) => {
   try {
     // Create checkout session
     const { sessionId, error } = await createCheckoutSession({
+      priceId: 'price_geo_audit_997', // Replace with your actual price ID
       successUrl: `${window.location.origin}/geo-audit-success`,
       cancelUrl: `${window.location.origin}/generative-engine-optimization-guide-thanks`,
       customerEmail,
