@@ -1,6 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 
 // Initialize Stripe with your publishable key
+// Replace with your actual Stripe publishable key
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
 
 export interface CheckoutSessionData {
@@ -13,26 +14,22 @@ export interface CheckoutSessionData {
 
 export const createCheckoutSession = async (data: CheckoutSessionData) => {
   try {
-    // Use your deployed API endpoint instead of Supabase
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    
-    const response = await fetch(`${apiUrl}/api/create-checkout-session`, {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Failed to create checkout session');
+      throw new Error('Failed to create checkout session');
     }
 
     const session = await response.json();
     return { sessionId: session.id, error: null };
   } catch (error) {
-    console.error('Checkout session error:', error);
     return { sessionId: null, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
@@ -55,16 +52,8 @@ export const redirectToCheckout = async (sessionId: string) => {
 
 export const handleGEOAuditCheckout = async (customerEmail?: string) => {
   try {
-    // You need to set this to your actual Stripe price ID
-    const priceId = import.meta.env.VITE_STRIPE_PRICE_ID || 'price_1234567890';
-    
-    if (!priceId || priceId === 'price_1234567890') {
-      throw new Error('Stripe price ID not configured. Please set VITE_STRIPE_PRICE_ID in your environment variables.');
-    }
-
     // Create checkout session
     const { sessionId, error } = await createCheckoutSession({
-      priceId,
       successUrl: `${window.location.origin}/geo-audit-success`,
       cancelUrl: `${window.location.origin}/generative-engine-optimization-guide-thanks`,
       customerEmail,
