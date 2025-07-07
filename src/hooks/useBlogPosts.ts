@@ -32,6 +32,7 @@ export const useBlogPosts = () => {
     try {
       setLoading(true);
       // Initialize sample data if needed
+      const { initializeSampleData, getBlogPosts } = await import('../lib/localStorage');
       initializeSampleData();
       const blogPosts = getBlogPosts();
       setPosts(blogPosts);
@@ -48,6 +49,7 @@ export const useBlogPosts = () => {
 
   const createBlogPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
     try {
+      const { createBlogPost: createPost } = await import('../lib/localStorage');
       const newPost = createPost(postData);
       await fetchPosts(); // Refresh the list
       return { data: newPost, error: null };
@@ -58,6 +60,7 @@ export const useBlogPosts = () => {
 
   const updateBlogPost = async (id: string, postData: Partial<BlogPost>) => {
     try {
+      const { updateBlogPost: updatePost } = await import('../lib/localStorage');
       const updatedPost = updatePost(id, postData);
       if (!updatedPost) {
         return { data: null, error: 'Post not found' };
@@ -71,6 +74,7 @@ export const useBlogPosts = () => {
 
   const deleteBlogPost = async (id: string) => {
     try {
+      const { deleteBlogPost: deletePost } = await import('../lib/localStorage');
       const success = deletePost(id);
       if (!success) {
         return { error: 'Post not found' };
@@ -84,6 +88,7 @@ export const useBlogPosts = () => {
 
   const likePost = async (postId: string) => {
     try {
+      const { likeBlogPost } = await import('../lib/localStorage');
       const result = likeBlogPost(postId);
       if (!result.success) {
         return { error: result.error || 'Failed to like post' };
