@@ -63,8 +63,14 @@ serve(async (req) => {
           console.error('Error storing order:', orderError)
         }
 
-        // Send fulfillment email (you can customize this)
-        await sendFulfillmentEmail(session)
+        // Log successful payment for fulfillment
+        console.log('GEO Audit order received:', {
+          sessionId: session.id,
+          customerEmail: session.customer_email,
+          amount: session.amount_total / 100,
+          currency: session.currency,
+          metadata: session.metadata
+        })
         
         break
       }
@@ -123,24 +129,3 @@ serve(async (req) => {
     )
   }
 })
-
-// Helper function to send fulfillment email
-async function sendFulfillmentEmail(session: any) {
-  try {
-    // You can integrate with your email service here
-    // For now, we'll just log the fulfillment
-    console.log('Fulfillment needed for session:', session.id)
-    
-    // Example: Send email notification to your team
-    // await sendEmail({
-    //   to: 'fulfillment@melnyresults.com',
-    //   subject: 'New GEO Audit Order',
-    //   body: `New order received: ${session.id}\nCustomer: ${session.customer_email}\nAmount: $${session.amount_total / 100}`
-    // })
-    
-    return true
-  } catch (error) {
-    console.error('Error sending fulfillment email:', error)
-    return false
-  }
-}
