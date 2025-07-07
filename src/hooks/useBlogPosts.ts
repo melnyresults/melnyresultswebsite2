@@ -13,6 +13,8 @@ export type BlogPost = {
   image_url?: string;
   likes_count: number;
 };
+
+export type {
   BlogPost, 
   getBlogPosts, 
   createBlogPost as createPost, 
