@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Allow all search engines to crawl the site
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://fanciful-kitsune-b8c426.netlify.app/sitemap.xml

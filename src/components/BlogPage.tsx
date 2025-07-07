@@ -160,6 +160,7 @@ const BlogPage: React.FC = () => {
                           alt={post.title}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                           style={{ aspectRatio: '16/9' }}
+                          loading="lazy"
                         />
                         {/* Category Badge */}
                         <div className="absolute top-4 left-4">

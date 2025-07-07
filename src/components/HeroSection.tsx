@@ -5,6 +5,11 @@ import { Rocket } from 'lucide-react';
 const HeroSection: React.FC = () => {
   return (
     <section className="pt-48 pb-40 bg-gradient-to-b from-gray-50 to-white overflow-hidden relative">
+      {/* SEO H1 - Hidden but accessible to search engines */}
+      <h1 className="sr-only">
+        Melny Results - Marketing Agency That Guarantees More Growth and More Clients
+      </h1>
+      
       {/* Background Geometric Pattern */}
       <div className="absolute top-0 right-0 w-1/2 h-full opacity-5 pointer-events-none">
         <div className="absolute inset-0" style={{
@@ -17,10 +22,10 @@ const HeroSection: React.FC = () => {
         <div className="max-w-4xl mx-auto text-center">
           {/* Content */}
           <div className="animate-slide-up">
-            <h1 className="text-6xl lg:text-7xl font-semibold text-gray-900 leading-tight mb-6">
+            <h2 className="text-6xl lg:text-7xl font-semibold text-gray-900 leading-tight mb-6">
               More Growth. More Clients.{' '}
               <span className="text-primary-red">Guaranteed.</span>
-            </h1>
+            </h2>
             
             <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
               And this time, you won't be burned. We don't get paid unless you win. 

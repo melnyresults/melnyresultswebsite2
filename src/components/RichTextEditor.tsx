@@ -52,7 +52,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     editorProps: {
       attributes: {
         class: 'prose prose-lg max-w-none focus:outline-none min-h-[400px] p-4',
+        'data-placeholder': placeholder,
       },
+    },
+    parseOptions: {
+      preserveWhitespace: 'full',
     },
   });
 

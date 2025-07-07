@@ -273,8 +273,9 @@ const BlogPostPage: React.FC = () => {
           <div className="relative h-96 overflow-hidden">
             <img 
               src={post.image_url}
-              alt={post.title}
+              alt={`Featured image for: ${post.title}`}
               className="w-full h-full object-cover"
+              loading="eager"
             />
             <div className="absolute inset-0 bg-black bg-opacity-40"></div>
             

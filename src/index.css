@@ -89,3 +89,42 @@ stripe-buy-button {
   color: #004080;
   font-weight: 600;
 }
+
+/* Screen reader only class for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Image optimization */
+img {
+  max-width: 100%;
+  height: auto;
+  loading: lazy;
+}
+
+/* Ensure images have proper alt text styling */
+img:not([alt]) {
+  border: 2px solid red;
+}
+
+/* Core Web Vitals optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Reduce layout shift */
+.aspect-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
