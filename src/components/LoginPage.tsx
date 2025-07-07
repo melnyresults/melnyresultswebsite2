@@ -73,6 +73,7 @@ const LoginPage: React.FC = () => {
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
+              </button>
             </div>
           </div>
         </div>
