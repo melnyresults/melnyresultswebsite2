@@ -135,6 +135,7 @@ const PostEditor: React.FC = () => {
     };
 
     try {
+      let postId = id;
     if (isEditing && id) {
         const updatedPost = updateBlogPost(id, postData);
         if (!updatedPost) {
@@ -143,12 +144,13 @@ const PostEditor: React.FC = () => {
           return;
         }
     } else {
-        createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
+        const newPost = createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
+        postId = newPost.id;
     }
 
       localStorage.removeItem('blog_draft');
       await refetch(); // Refresh the posts list
-      navigate('/admin/dashboard');
+      navigate(`/admin/posts/published/${postId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }

@@ -22,6 +22,7 @@ import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
 import GenerativeEngineOptimizationPage from './components/GenerativeEngineOptimizationPage';
 import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngineOptimizationThanksPage';
+import BlogPublishConfirmation from './components/BlogPublishConfirmation';
 import { usePageMeta } from './hooks/usePageMeta';
 
 // Component to handle scroll to top on route change
@@ -131,6 +132,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PostEditor />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/posts/published/:id" 
+          element={
+            <ProtectedRoute>
+              <BlogPublishConfirmation />
             </ProtectedRoute>
           } 
         />
