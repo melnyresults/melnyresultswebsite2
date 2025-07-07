@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Eye, Calendar, User, Image, Tag, Clock, FileText, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BlogPost } from '../lib/localStorage';
+import { BlogPost, createBlogPost, updateBlogPost } from '../lib/localStorage';
 import RichTextEditor from './RichTextEditor';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -12,7 +12,7 @@ const PostEditor: React.FC = () => {
   const isEditing = Boolean(id);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { posts, createPost, updatePost } = useBlogPosts();
+  const { posts, refetch } = useBlogPosts();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -134,18 +134,23 @@ const PostEditor: React.FC = () => {
       published_at: new Date(formData.published_at).toISOString(),
     };
 
-    let result;
+    try {
     if (isEditing && id) {
-      result = await updatePost(id, postData);
+        const updatedPost = updateBlogPost(id, postData);
+        if (!updatedPost) {
+          setError('Post not found');
+          setLoading(false);
+          return;
+        }
     } else {
-      result = await createPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
+        createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
     }
 
-    if (result.error) {
-      setError(result.error);
-    } else {
       localStorage.removeItem('blog_draft');
+      await refetch(); // Refresh the posts list
       navigate('/admin/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
 
     setLoading(false);
