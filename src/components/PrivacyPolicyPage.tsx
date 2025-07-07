@@ -123,6 +123,15 @@ const PrivacyPolicyPage: React.FC = () => {
               </p>
             </div>
           </div>
+          
+          {/* Logo */}
+          <div className="mt-8">
+            <img 
+              src="/src/assets/image (10).png" 
+              alt="Melny Results Logo" 
+              className="h-48 w-auto mx-auto"
+            />
+          </div>
         </div>
       </div>
 
