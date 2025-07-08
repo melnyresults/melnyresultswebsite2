@@ -6,6 +6,8 @@ import { usePageMeta } from '../hooks/usePageMeta';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '+1 '
   });
@@ -72,6 +74,8 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
             email: formData.email,
             phone: formData.phone,
             source: 'GEO Landing Page',
@@ -86,8 +90,8 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       }
 
       saveMarketingSubmission({
-        first_name: 'GEO Guide',
-        last_name: 'Request',
+        first_name: formData.firstName,
+        last_name: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         company_name: 'GEO Guide Download',
@@ -147,6 +151,42 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Name Fields */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        required
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                        placeholder="John"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        required
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                        placeholder="Doe"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
                   {/* Enhanced Email Field */}
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-left">
