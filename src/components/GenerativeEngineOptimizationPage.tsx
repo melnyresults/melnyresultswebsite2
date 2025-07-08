@@ -59,6 +59,13 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
     setError(null);
     
     try {
+      // Validate required fields
+      if (!formData.firstName.trim() || !formData.lastName.trim()) {
+        setError('Please enter your first and last name');
+        setIsSubmitting(false);
+        return;
+      }
+
       // Validate phone number has more than just +1
       if (formData.phone.trim() === '+1' || formData.phone.trim() === '+1 ') {
         setError('Please enter a valid phone number');
@@ -67,23 +74,30 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       }
 
       // Send to Zapier webhook
+      const webhookData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        source: 'GEO Landing Page',
+        form_type: 'GEO Guide Download',
+        submitted_at: new Date().toISOString(),
+        page_url: window.location.href
+      };
+      
+      console.log('Sending webhook data:', webhookData);
+      
       try {
-        await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
+        const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            source: 'GEO Landing Page',
-            form_type: 'GEO Guide Download',
-            submitted_at: new Date().toISOString(),
-            page_url: window.location.href
-          }),
+          body: JSON.stringify(webhookData),
         });
+        
+        console.log('Webhook response status:', response.status);
+        console.log('Webhook sent successfully');
       } catch (webhookError) {
         console.error('Webhook error:', webhookError);
         // Continue with local storage even if webhook fails
