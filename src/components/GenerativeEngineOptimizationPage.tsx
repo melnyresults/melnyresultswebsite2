@@ -38,8 +38,6 @@ const CloserPage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-1 
-      
       // Store form data in localStorage for potential future use
       localStorage.setItem('closerApplication', JSON.stringify({
         ...formData,
@@ -60,30 +58,27 @@ const CloserPage: React.FC = () => {
     <div className="min-h-screen bg-white">
       {/* Navigation */}
       <nav className="bg-white shadow-[0_4px_20px_rgb(0,0,0,0.08)]">
-          body: JSON.stringify(webhookData),
-      if (!formData.firstName.trim() || !formData.lastName.trim()) {
-        
-        console.log('Webhook sent successfully');
-        setError('Please enter your first and last name');
-        setIsSubmitting(false);
-        return;
-      }
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <Link to="/" className="flex items-center">
+                <img 
+                  src="/melny-results-logo.png" 
+                  alt="Melny Results" 
+                  className="h-12 w-auto"
+                />
+              </Link>
+            </div>
 
+            {/* Desktop Navigation */}
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-8">
+                <Link to="/" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+                  Home
+                </Link>
                 <Link to="/free-marketing-analysis" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
                   Free Marketing Analysis
-        const webhookData = {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          source: 'GEO Landing Page',
-          form_type: 'GEO Guide Download',
-          submitted_at: new Date().toISOString(),
-          page_url: window.location.href
-        };
-        
-        console.log('Sending webhook data:', webhookData);
-        
                 </Link>
                 <Link to="/blog" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
                   Blog
