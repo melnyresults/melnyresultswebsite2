@@ -78,7 +78,7 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
-        phone: formData.phone,
+        phone: formData.phone.trim(),
         source: 'GEO Landing Page',
         form_type: 'GEO Guide Download',
         submitted_at: new Date().toISOString(),
@@ -92,12 +92,18 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
           body: JSON.stringify(webhookData),
         });
         
-        console.log('Webhook response status:', response.status);
-        console.log('Webhook sent successfully');
+        if (response.ok) {
+          console.log('Webhook sent successfully, status:', response.status);
+        } else {
+          console.error('Webhook failed with status:', response.status);
+          const errorText = await response.text();
+          console.error('Webhook error response:', errorText);
+        }
       } catch (webhookError) {
         console.error('Webhook error:', webhookError);
         // Continue with local storage even if webhook fails
