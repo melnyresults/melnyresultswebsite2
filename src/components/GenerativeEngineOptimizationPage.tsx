@@ -74,52 +74,32 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       }
 
       // Send to Zapier webhook
-      const webhookData = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        phone: formData.phone.trim(),
-        source: 'GEO Landing Page',
-        form_type: 'GEO Guide Download',
-        submitted_at: new Date().toISOString(),
-        page_url: window.location.href
-      };
+      // Create FormData object (not JSON!)
+      const formDataToSend = new FormData();
+      formDataToSend.append('first_name', formData.firstName);
+      formDataToSend.append('last_name', formData.lastName);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone.trim());
+      formDataToSend.append('source', 'GEO Landing Page');
+      formDataToSend.append('form_type', 'GEO Guide Download');
+      formDataToSend.append('timestamp', new Date().toISOString());
+      formDataToSend.append('page_url', window.location.href);
       
-      console.log('Sending webhook data:', webhookData);
+      console.log('Sending webhook FormData...');
       
       try {
-        console.log('About to send webhook request...');
-        console.log('Webhook URL: https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/');
-        console.log('Request body:', JSON.stringify(webhookData));
-        
         const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify(webhookData),
+          body: formDataToSend  // Send FormData directly, no headers needed
         });
         
-        console.log('Response received, status:', response.status);
-        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+        console.log('Webhook sent - Status:', response.status);
         
-        if (response.ok) {
-          console.log('Webhook sent successfully, status:', response.status);
-          const responseText = await response.text();
-          console.log('Response body:', responseText);
-        } else {
+        if (!response.ok) {
           console.error('Webhook failed with status:', response.status);
-          const errorText = await response.text();
-          console.error('Webhook error response:', errorText);
         }
       } catch (webhookError) {
-        console.error('Webhook network/fetch error:', webhookError);
-        console.error('Error details:', {
-          name: webhookError.name,
-          message: webhookError.message,
-          stack: webhookError.stack
-        });
+        console.error('Webhook error:', webhookError);
         // Continue with local storage even if webhook fails
       }
 
