@@ -88,6 +88,10 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       console.log('Sending webhook data:', webhookData);
       
       try {
+        console.log('About to send webhook request...');
+        console.log('Webhook URL: https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/');
+        console.log('Request body:', JSON.stringify(webhookData));
+        
         const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
           method: 'POST',
           headers: {
@@ -97,15 +101,25 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
           body: JSON.stringify(webhookData),
         });
         
+        console.log('Response received, status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+        
         if (response.ok) {
           console.log('Webhook sent successfully, status:', response.status);
+          const responseText = await response.text();
+          console.log('Response body:', responseText);
         } else {
           console.error('Webhook failed with status:', response.status);
           const errorText = await response.text();
           console.error('Webhook error response:', errorText);
         }
       } catch (webhookError) {
-        console.error('Webhook error:', webhookError);
+        console.error('Webhook network/fetch error:', webhookError);
+        console.error('Error details:', {
+          name: webhookError.name,
+          message: webhookError.message,
+          stack: webhookError.stack
+        });
         // Continue with local storage even if webhook fails
       }
 
