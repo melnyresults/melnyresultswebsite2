@@ -1,56 +1,96 @@
 import React, { useState } from 'react';
-import { Check, X, Menu, X as CloseIcon, Target, Flame, Rocket, Lock, Clock } from 'lucide-react';
+import { Menu, X as CloseIcon, Target, Flame, Rocket, Lock, Download, Zap, TrendingUp, Eye } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePageMeta } from '../hooks/usePageMeta';
 
-const CloserPage: React.FC = () => {
+const GenerativeEngineOptimizationPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    phone: '',
-    linkedin: '',
-    salesExperience: '',
-    whyCloser: '',
-    agreeCommission: false
+    phone: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   
   usePageMeta({
-    title: 'High-Ticket Closer Position - Melny Results',
-    description: 'We\'re hiring 1 high-ticket closer to handle 10-30 pre-booked calls a week, selling marketing services from $2K to $30K/month.',
-    keywords: 'sales job, closer position, high ticket sales, commission only, remote sales job',
-    ogTitle: 'You\'re Either a Closer... Or You\'re Pretending.',
-    ogDescription: 'No cold calling. No base pay. No tire kickers. Just red-hot leads... and fat commission.',
+    title: 'Free Generative Engine Optimization Guide - Melny Results',
+    description: 'Download our comprehensive guide to mastering Generative Engine Optimization (GEO) and dominating AI-powered search results.',
+    keywords: 'generative engine optimization, GEO, AI search, ChatGPT optimization, AI marketing, search optimization',
+    ogTitle: 'Master Generative Engine Optimization - Free Guide',
+    ogDescription: 'Get the complete playbook for optimizing your content for AI-powered search engines like ChatGPT, Claude, and Perplexity.',
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: value
     }));
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
     
     try {
-1 
+      // Validate required fields
+      if (!formData.firstName.trim() || !formData.lastName.trim()) {
+        setError('Please enter your first and last name');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!formData.email.trim()) {
+        setError('Please enter your email address');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Prepare webhook data
+      const webhookData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        source: 'GEO Landing Page',
+        form_type: 'GEO Guide Download',
+        submitted_at: new Date().toISOString(),
+        page_url: window.location.href
+      };
       
-      // Store form data in localStorage for potential future use
-      localStorage.setItem('closerApplication', JSON.stringify({
-        ...formData,
-        submittedAt: new Date().toISOString()
-      }));
+      console.log('Sending webhook data:', webhookData);
       
-      // Redirect to thank you page
-      navigate('/closer/thank-you');
+      // Send to Zapier webhook
+      const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookData),
+      });
+
+      if (response.ok) {
+        console.log('Webhook sent successfully');
+        
+        // Store form data in localStorage for potential future use
+        localStorage.setItem('geoGuideDownload', JSON.stringify({
+          ...formData,
+          submittedAt: new Date().toISOString()
+        }));
+        
+        // Redirect to thank you page
+        navigate('/generative-engine-optimization-guide-thanks');
+      } else {
+        throw new Error('Failed to submit form');
+      }
     } catch (error) {
       console.error('Form submission error:', error);
-      alert('There was an error submitting your application. Please try again.');
+      setError('There was an error submitting your request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -60,30 +100,27 @@ const CloserPage: React.FC = () => {
     <div className="min-h-screen bg-white">
       {/* Navigation */}
       <nav className="bg-white shadow-[0_4px_20px_rgb(0,0,0,0.08)]">
-          body: JSON.stringify(webhookData),
-      if (!formData.firstName.trim() || !formData.lastName.trim()) {
-        
-        console.log('Webhook sent successfully');
-        setError('Please enter your first and last name');
-        setIsSubmitting(false);
-        return;
-      }
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <Link to="/" className="flex items-center">
+                <img 
+                  src="/melny-results-logo.png" 
+                  alt="Melny Results" 
+                  className="h-8 w-auto"
+                />
+              </Link>
+            </div>
 
+            {/* Desktop Navigation */}
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-8">
+                <Link to="/" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
+                  Home
+                </Link>
                 <Link to="/free-marketing-analysis" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
                   Free Marketing Analysis
-        const webhookData = {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          source: 'GEO Landing Page',
-          form_type: 'GEO Guide Download',
-          submitted_at: new Date().toISOString(),
-          page_url: window.location.href
-        };
-        
-        console.log('Sending webhook data:', webhookData);
-        
                 </Link>
                 <Link to="/blog" className="text-gray-900 hover:text-primary-blue transition-colors duration-200 font-medium">
                   Blog
@@ -139,346 +176,279 @@ const CloserPage: React.FC = () => {
         )}
       </nav>
 
-      {/* Hero Section with Enhanced Design */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Urgency Icon */}
+          {/* Icon */}
           <div className="flex justify-center mb-6">
-            <Flame className="w-12 h-12 text-primary-red animate-pulse" />
+            <Zap className="w-12 h-12 text-primary-blue animate-pulse" />
           </div>
 
-          {/* Enhanced Headline */}
-          <h1 className="text-6xl lg:text-7xl font-semibold text-gray-900 leading-tight mb-6">
-            You're Either a Closer... Or<br />
-            <span className="text-primary-red relative">
-              You're Pretending.
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-red"></div>
-            </span>
+          {/* Headline */}
+          <h1 className="text-5xl lg:text-6xl font-semibold text-gray-900 leading-tight mb-6">
+            Master <span className="text-primary-blue relative">
+              Generative Engine
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-blue"></div>
+            </span><br />
+            Optimization (GEO)
           </h1>
           
-          {/* Enhanced Subheadline */}
+          {/* Subheadline */}
           <div className="max-w-2xl mx-auto mb-12 leading-relaxed text-xl">
-            <p className="text-gray-700 mb-1">
-              We're hiring <strong>1 high-ticket closer</strong> to handle <strong>10-30 pre-booked calls</strong>
+            <p className="text-gray-700 mb-2">
+              The <strong>complete playbook</strong> for dominating AI-powered search engines
             </p>
-            <p className="text-gray-700 mb-1">
-              <strong>a week</strong>, selling marketing services from <strong>$2K to $30K/month</strong>.
-            </p>
-            <p className="text-gray-700 mb-1">
-              No cold calling. No base pay. No tire kickers.
+            <p className="text-gray-700 mb-2">
+              like <strong>ChatGPT, Claude, and Perplexity</strong>.
             </p>
             <p className="text-gray-700 font-semibold">
-              Just red-hot leads... and fat commission.
+              Get found when your customers ask AI for recommendations.
             </p>
           </div>
 
-          {/* Enhanced Video Section */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="bg-white p-4 rounded-2xl shadow-xl">
-              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full rounded-lg"
-                  src="https://www.youtube.com/embed/aUJI02OenUg"
-                  title="This Is The Best Closer Role You'll Find..."
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-                {/* Red Play Button Overlay - This would be visible on thumbnail */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-16 h-16 bg-primary-red rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
-                  </div>
-                </div>
-              </div>
+          {/* Benefits Grid */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <Eye className="w-8 h-8 text-primary-blue mx-auto mb-4" />
+              <h3 className="font-semibold text-gray-900 mb-2">Get Discovered</h3>
+              <p className="text-gray-600 text-sm">Show up in AI responses when prospects search for solutions</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <TrendingUp className="w-8 h-8 text-primary-blue mx-auto mb-4" />
+              <h3 className="font-semibold text-gray-900 mb-2">Drive Traffic</h3>
+              <p className="text-gray-600 text-sm">Capture the growing AI search traffic before competitors</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <Target className="w-8 h-8 text-primary-blue mx-auto mb-4" />
+              <h3 className="font-semibold text-gray-900 mb-2">Beat Competition</h3>
+              <p className="text-gray-600 text-sm">Dominate the new frontier of search optimization</p>
             </div>
           </div>
-
-          <p className="text-gray-600 italic text-lg">
-            Watch this before you apply—it filters out the weak.
-          </p>
         </div>
       </section>
 
-      {/* Enhanced Qualifier Section */}
+      {/* Download Form Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl lg:text-6xl font-semibold text-gray-900 mb-12">
-              "Is this really for me?"
-            </h2>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* This is for you if - Green Card */}
-            <div className="bg-green-50 p-8 rounded-2xl shadow-lg border border-green-100">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                  <Check className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-3xl font-semibold text-gray-900">
-                  This is for you if...
-                </h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You've got 6-12+ months sales experience</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You speak and write fluent English</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You know Zoom, Slack, CRMs, Google Sheets</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You're available for 10-30 calls/week</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You thrive on commission and pressure</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You're coachable, competitive, and want more</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Don't even bother if - Red Card */}
-            <div className="bg-red-50 p-8 rounded-2xl shadow-lg border border-red-100">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                  <X className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-3xl font-semibold text-gray-900">
-                  Don't even bother if...
-                </h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You're looking for base pay</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You ghost leads or flake on calls</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You want someone to "train you from scratch"</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You're a "people person" but can't close</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You're scared to get uncomfortable</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <X className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                  <span className="text-lg text-gray-700">You need to be told what to do every day</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Application Form Section */}
-      <section className="py-20 bg-gray-50">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-semibold text-gray-900 mb-6">
-              Ready to prove you're a closer?
+              Download Your Free GEO Guide
             </h2>
             <p className="text-lg text-gray-700 mb-2">
-              Fill this out and we'll send you an email with the next available time slots.
+              Enter your details below to get instant access to the complete guide.
             </p>
             <p className="text-lg text-gray-700 font-semibold">
-              We're moving fast—be ready.
+              No fluff. Just actionable strategies that work.
             </p>
           </div>
 
-          {/* Enhanced Form Card */}
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100" style={{ width: '80%', margin: '0 auto' }}>
+          {/* Form Card */}
+          <div className="bg-gray-50 p-8 rounded-2xl shadow-xl border border-gray-100">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full name *
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  required
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors"
-                  disabled={isSubmitting}
-                />
-              </div>
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email *
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                    First Name *
                   </label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
+                    type="text"
+                    id="firstName"
+                    name="firstName"
                     required
-                    value={formData.email}
+                    value={formData.firstName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors"
+                    className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                     disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone *
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Last Name *
                   </label>
                   <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
+                    type="text"
+                    id="lastName"
+                    name="lastName"
                     required
-                    value={formData.phone}
+                    value={formData.lastName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors"
+                    className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                     disabled={isSubmitting}
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-2">
-                  LinkedIn / Portfolio / Recordings (Link) (optional)
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address *
                 </label>
                 <input
-                  type="url"
-                  id="linkedin"
-                  name="linkedin"
-                  value={formData.linkedin}
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors"
+                  className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                   disabled={isSubmitting}
                 />
               </div>
 
               <div>
-                <label htmlFor="salesExperience" className="block text-sm font-medium text-gray-700 mb-2">
-                  Brief sales experience summary (1-3 sentences) *
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number (optional)
                 </label>
-                <textarea
-                  id="salesExperience"
-                  name="salesExperience"
-                  required
-                  rows={4}
-                  value={formData.salesExperience}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors resize-none"
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="whyCloser" className="block text-sm font-medium text-gray-700 mb-2">
-                  Why do you want this closer role?
-                </label>
-                <textarea
-                  id="whyCloser"
-                  name="whyCloser"
-                  rows={4}
-                  value={formData.whyCloser}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors resize-none"
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="flex items-start gap-3">
                 <input
-                  type="checkbox"
-                  id="agreeCommission"
-                  name="agreeCommission"
-                  required
-                  checked={formData.agreeCommission}
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
                   onChange={handleInputChange}
-                  className="mt-1 w-4 h-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
+                  className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                   disabled={isSubmitting}
                 />
-                <label htmlFor="agreeCommission" className="text-sm text-gray-700">
-                  I understand this is a commission-only position.
-                </label>
               </div>
 
-              {/* Enhanced Submit Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-primary-red text-white px-8 py-5 rounded-lg text-lg font-semibold hover:bg-red-800 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                className="w-full bg-primary-blue text-white px-8 py-5 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
               >
-                <Rocket className="w-5 h-5" />
+                <Download className="w-5 h-5" />
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    Submitting Application...
+                    Sending Guide...
                   </div>
                 ) : (
-                  'Apply Now – Let\'s See What You\'ve Got'
+                  'Download Free GEO Guide'
                 )}
               </button>
             </form>
 
-            {/* Lock Icon and Microcopy */}
+            {/* Privacy Notice */}
             <div className="mt-6 text-center">
               <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
                 <Lock className="w-4 h-4" />
-                <span>Your info stays private. No spam—just next steps.</span>
+                <span>Your information is secure. No spam, just valuable insights.</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Enhanced Final Urgency Section */}
-      <section className="py-20 bg-red-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Enhanced Headline */}
-          <h2 className="text-5xl font-semibold text-gray-900 mb-8">
-            We're Only Hiring ONE Closer.
-          </h2>
-          
-          <div className="max-w-2xl mx-auto mb-12">
-            <p className="text-lg text-gray-700 mb-2">
-              We're not mass-recruiting. This isn't a churn-and-burn boiler room.
-            </p>
-            <p className="text-lg text-gray-700 mb-2">
-              We're bringing in one savage to step in, close hard, and make a ton of money.
-            </p>
-            <p className="text-lg text-gray-700 mb-2">
-              If this page is live, the spot's still open.
-            </p>
-            <p className="text-lg text-gray-700 font-semibold">
-              But if you hesitate... someone else is taking it.
+      {/* What You'll Learn Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-semibold text-gray-900 mb-6">
+              What You'll Learn Inside
+            </h2>
+            <p className="text-lg text-gray-700">
+              Everything you need to dominate generative AI search results
             </p>
           </div>
 
-          {/* Enhanced CTA Button with Animation */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white font-semibold text-sm">1</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Understanding GEO Fundamentals</h3>
+                  <p className="text-gray-600">How AI engines work and why traditional SEO isn't enough</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white font-semibold text-sm">2</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Content Optimization Strategies</h3>
+                  <p className="text-gray-600">Proven techniques to make your content AI-friendly</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white font-semibold text-sm">3</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Authority Building Tactics</h3>
+                  <p className="text-gray-600">How to become the go-to source AI engines recommend</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white font-semibold text-sm">4</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Technical Implementation</h3>
+                  <p className="text-gray-600">Step-by-step setup and optimization checklist</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white font-semibold text-sm">5</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Measurement & Analytics</h3>
+                  <p className="text-gray-600">Track your GEO performance and optimize for results</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white font-semibold text-sm">6</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Future-Proofing Strategies</h3>
+                  <p className="text-gray-600">Stay ahead as AI search continues to evolve</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 bg-primary-blue">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-semibold text-white mb-8">
+            Don't Get Left Behind in the AI Revolution
+          </h2>
+          
+          <div className="max-w-2xl mx-auto mb-12">
+            <p className="text-lg text-blue-100 mb-2">
+              While your competitors are still focused on traditional SEO,
+            </p>
+            <p className="text-lg text-blue-100 mb-2">
+              you can dominate the future of search with GEO.
+            </p>
+            <p className="text-lg text-white font-semibold">
+              Download your free guide and get started today.
+            </p>
+          </div>
+
           <button 
             onClick={() => document.querySelector('form')?.scrollIntoView({ behavior: 'smooth' })}
-            className="bg-primary-red text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl animate-pulse flex items-center justify-center gap-2 mx-auto"
+            className="bg-white text-primary-blue px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center gap-2 mx-auto"
           >
-            <Clock className="w-5 h-5" />
-            Apply Now Before the Spot's Gone
+            <Download className="w-5 h-5" />
+            Get Your Free GEO Guide Now
           </button>
         </div>
       </section>
@@ -509,4 +479,4 @@ const CloserPage: React.FC = () => {
   );
 };
 
-export default CloserPage;
+export default GenerativeEngineOptimizationPage;
