@@ -13,6 +13,7 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const navigate = useNavigate();
   
   usePageMeta({
@@ -51,6 +52,39 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       ...prev,
       phone: value
     }));
+    
+    // Clear phone error when user starts typing
+    if (phoneError) {
+      setPhoneError(null);
+    }
+  };
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    // Remove all non-digit characters except the leading +
+    const cleanPhone = phone.replace(/[^\d+]/g, '');
+    
+    // Check if it starts with +1 and has at least 11 digits total (+1 + 10 digits)
+    const phoneRegex = /^\+1\d{10}$/;
+    return phoneRegex.test(cleanPhone);
+  };
+
+  const formatPhoneForDisplay = (phone: string): string => {
+    // Remove all non-digit characters except the leading +
+    const cleanPhone = phone.replace(/[^\d+]/g, '');
+    
+    if (cleanPhone.length >= 4) {
+      // Format as +1 (XXX) XXX-XXXX
+      const match = cleanPhone.match(/^\+1(\d{0,3})(\d{0,3})(\d{0,4})/);
+      if (match) {
+        let formatted = '+1';
+        if (match[1]) formatted += ` (${match[1]}`;
+        if (match[2]) formatted += `) ${match[2]}`;
+        if (match[3]) formatted += `-${match[3]}`;
+        return formatted;
+      }
+    }
+    
+    return phone;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,8 +101,8 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       }
 
       // Validate phone number has more than just +1
-      if (formData.phone.trim() === '+1' || formData.phone.trim() === '+1 ') {
-        setError('Please enter a valid phone number');
+      if (!validatePhoneNumber(formData.phone)) {
+        setPhoneError('Please enter a valid US phone number (10 digits)');
         setIsSubmitting(false);
         return;
       }
@@ -231,16 +265,24 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                       required
                       value={formData.phone}
                       onChange={handlePhoneChange}
-                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                      className={`w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:bg-white transition-colors text-lg ${
+                        phoneError ? 'focus:ring-red-500 bg-red-50' : 'focus:ring-primary-blue'
+                      }`}
                       placeholder="+1 (555) 123-4567"
                       disabled={isSubmitting}
                     />
+                    {phoneError && (
+                      <p className="mt-2 text-sm text-red-600">{phoneError}</p>
+                    )}
+                    <p className="mt-2 text-xs text-gray-500">
+                      Enter a valid US phone number with area code
+                    </p>
                   </div>
 
                   {/* Enhanced Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !validatePhoneNumber(formData.phone)}
                     className="w-full bg-primary-red text-white px-8 py-5 rounded-lg text-lg font-semibold hover:bg-red-800 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                   >
                     <Download className="w-5 h-5" />
