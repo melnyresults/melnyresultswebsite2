@@ -51,42 +51,33 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
         return;
       }
 
-      // Prepare webhook data with all form fields
+      // Prepare webhook data
       const webhookData = {
-        first_name: formData.firstName.trim(),
-        last_name: formData.lastName.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim() || '',
-        full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
         source: 'GEO Landing Page',
         form_type: 'GEO Guide Download',
         submitted_at: new Date().toISOString(),
-        page_url: window.location.href,
-        user_agent: navigator.userAgent,
-        timestamp: Date.now()
+        page_url: window.location.href
       };
       
-      console.log('Sending webhook data to Zapier:', webhookData);
+      console.log('Sending webhook data:', webhookData);
       
       // Send to Zapier webhook
       const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
         body: JSON.stringify(webhookData),
       });
 
-      console.log('Webhook response status:', response.status);
-      console.log('Webhook response headers:', response.headers);
-
       if (response.ok) {
-        const responseData = await response.text();
-        console.log('Webhook response data:', responseData);
-        console.log('✅ Webhook sent successfully to Zapier');
+        console.log('Webhook sent successfully');
         
-        // Store form data in localStorage for backup
+        // Store form data in localStorage for potential future use
         localStorage.setItem('geoGuideDownload', JSON.stringify({
           ...formData,
           submittedAt: new Date().toISOString()
@@ -95,12 +86,10 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
         // Redirect to thank you page
         navigate('/generative-engine-optimization-guide-thanks');
       } else {
-        const errorText = await response.text();
-        console.error('Webhook failed with status:', response.status, 'Error:', errorText);
-        throw new Error(`Failed to submit form: ${response.status} ${errorText}`);
+        throw new Error('Failed to submit form');
       }
     } catch (error) {
-      console.error('❌ Form submission error:', error);
+      console.error('Form submission error:', error);
       setError('There was an error submitting your request. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -276,7 +265,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                     onChange={handleInputChange}
                     className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                     disabled={isSubmitting}
-                    placeholder="Enter your first name"
                   />
                 </div>
                 <div>
@@ -292,7 +280,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                     onChange={handleInputChange}
                     className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                     disabled={isSubmitting}
-                    placeholder="Enter your last name"
                   />
                 </div>
               </div>
@@ -310,7 +297,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                   disabled={isSubmitting}
-                  placeholder="your@email.com"
                 />
               </div>
 
@@ -326,7 +312,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-colors"
                   disabled={isSubmitting}
-                  placeholder="+1 (555) 123-4567"
                 />
               </div>
 
