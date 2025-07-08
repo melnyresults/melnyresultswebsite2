@@ -42,33 +42,6 @@ const FreeMarketingAnalysisPage: React.FC = () => {
     setError(null);
     
     try {
-      // Send to Zapier webhook first
-      try {
-        await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            company_name: formData.companyName,
-            how_did_you_find_us: formData.howDidYouFindUs,
-            monthly_spend: formData.monthlySpend,
-            website: formData.website,
-            source: 'Free Marketing Analysis',
-            form_type: 'Marketing Analysis Request',
-            submitted_at: new Date().toISOString(),
-            page_url: window.location.href
-          }),
-        });
-      } catch (webhookError) {
-        console.error('Webhook error:', webhookError);
-        // Continue with local storage even if webhook fails
-      }
-
       saveMarketingSubmission({
         first_name: formData.firstName,
         last_name: formData.lastName,
