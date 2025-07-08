@@ -35,33 +35,6 @@ const NewsletterPage: React.FC = () => {
     setError(null);
     
     try {
-      // Send to Zapier webhook first
-      const webhookData = {
-        email: formData.email,
-        source: 'Newsletter Page',
-        form_type: 'Newsletter Signup',
-        submitted_at: new Date().toISOString(),
-        page_url: window.location.href
-      };
-      
-      console.log('Sending webhook data:', webhookData);
-      
-      try {
-        const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3fdxuh/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(webhookData),
-        });
-        
-        console.log('Webhook response status:', response.status);
-        console.log('Webhook sent successfully');
-      } catch (webhookError) {
-        console.error('Webhook error:', webhookError);
-        // Continue with local storage even if webhook fails
-      }
-
       const result = saveNewsletterSignup(formData.email);
       
       if (!result.success) {
