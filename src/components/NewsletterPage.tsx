@@ -35,6 +35,39 @@ const NewsletterPage: React.FC = () => {
     setError(null);
     
     try {
+      // Validate email
+      if (!formData.email.trim()) {
+        setError('Please enter your email address');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Send to Zapier webhook
+      const formDataToSend = new FormData();
+      formDataToSend.append('email', formData.email.trim());
+      formDataToSend.append('source', 'Newsletter Page');
+      formDataToSend.append('form_type', 'Newsletter Signup');
+      formDataToSend.append('timestamp', new Date().toISOString());
+      formDataToSend.append('page_url', window.location.href);
+      
+      console.log('Sending newsletter webhook...');
+      
+      try {
+        const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3c3nq5/', {
+          method: 'POST',
+          body: formDataToSend
+        });
+        
+        console.log('Newsletter webhook sent - Status:', response.status);
+        
+        if (!response.ok) {
+          console.error('Newsletter webhook failed with status:', response.status);
+        }
+      } catch (webhookError) {
+        console.error('Newsletter webhook error:', webhookError);
+        // Continue with local storage even if webhook fails
+      }
+
       const result = saveNewsletterSignup(formData.email);
       
       if (!result.success) {
