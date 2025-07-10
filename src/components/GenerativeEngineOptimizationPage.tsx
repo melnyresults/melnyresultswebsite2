@@ -6,14 +6,12 @@ import { usePageMeta } from '../hooks/usePageMeta';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '+1 '
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
   const navigate = useNavigate();
   
   usePageMeta({
@@ -54,37 +52,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
     }));
     
     // Clear phone error when user starts typing
-    if (phoneError) {
-      setPhoneError(null);
-    }
-  };
-
-  const validatePhoneNumber = (phone: string): boolean => {
-    // Remove all non-digit characters except the leading +
-    const cleanPhone = phone.replace(/[^\d+]/g, '');
-    
-    // Check if it starts with +1 and has at least 11 digits total (+1 + 10 digits)
-    const phoneRegex = /^\+1\d{10}$/;
-    return phoneRegex.test(cleanPhone);
-  };
-
-  const formatPhoneForDisplay = (phone: string): string => {
-    // Remove all non-digit characters except the leading +
-    const cleanPhone = phone.replace(/[^\d+]/g, '');
-    
-    if (cleanPhone.length >= 4) {
-      // Format as +1 (XXX) XXX-XXXX
-      const match = cleanPhone.match(/^\+1(\d{0,3})(\d{0,3})(\d{0,4})/);
-      if (match) {
-        let formatted = '+1';
-        if (match[1]) formatted += ` (${match[1]}`;
-        if (match[2]) formatted += `) ${match[2]}`;
-        if (match[3]) formatted += `-${match[3]}`;
-        return formatted;
-      }
-    }
-    
-    return phone;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,15 +61,8 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
     
     try {
       // Validate required fields
-      if (!formData.firstName.trim() || !formData.lastName.trim()) {
-        setError('Please enter your first and last name');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Validate phone number has more than just +1
-      if (!validatePhoneNumber(formData.phone)) {
-        setPhoneError('Please enter a valid US phone number (10 digits)');
+      if (!formData.name.trim()) {
+        setError('Please enter your name');
         setIsSubmitting(false);
         return;
       }
@@ -110,10 +70,9 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       // Send to Zapier webhook
       // Create FormData object (not JSON!)
       const formDataToSend = new FormData();
-      formDataToSend.append('first_name', formData.firstName);
-      formDataToSend.append('last_name', formData.lastName);
+      formDataToSend.append('name', formData.name);
       formDataToSend.append('email', formData.email);
-      formDataToSend.append('phone', formData.phone.trim());
+      formDataToSend.append('phone', formData.phone.trim() || '');
       formDataToSend.append('source', 'GEO Landing Page');
       formDataToSend.append('form_type', 'GEO Guide Download');
       formDataToSend.append('timestamp', new Date().toISOString());
@@ -138,8 +97,8 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       }
 
       saveMarketingSubmission({
-        first_name: formData.firstName,
-        last_name: formData.lastName,
+        first_name: formData.name,
+        last_name: '',
         email: formData.email,
         phone: formData.phone,
         company_name: 'GEO Guide Download',
@@ -199,40 +158,22 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name Fields */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                        First Name *
-                      </label>
-                      <input
-                        type="text"
-                        id="firstName"
-                        name="firstName"
-                        required
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
-                        placeholder="John"
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        id="lastName"
-                        name="lastName"
-                        required
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
-                        placeholder="Doe"
-                        disabled={isSubmitting}
-                      />
-                    </div>
+                  {/* Name Field */}
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      required
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                      placeholder="John Doe"
+                      disabled={isSubmitting}
+                    />
                   </div>
 
                   {/* Enhanced Email Field */}
@@ -256,33 +197,27 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                   {/* Enhanced Phone Field */}
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                      Phone Number *
+                      Phone Number (optional)
                     </label>
                     <input
                       type="tel"
                       id="phone"
                       name="phone"
-                      required
                       value={formData.phone}
                       onChange={handlePhoneChange}
-                      className={`w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:bg-white transition-colors text-lg ${
-                        phoneError ? 'focus:ring-red-500 bg-red-50' : 'focus:ring-primary-blue'
-                      }`}
+                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
                       placeholder="+1 (555) 123-4567"
                       disabled={isSubmitting}
                     />
-                    {phoneError && (
-                      <p className="mt-2 text-sm text-red-600">{phoneError}</p>
-                    )}
                     <p className="mt-2 text-xs text-gray-500">
-                      Enter a valid US phone number with area code
+                      Optional - Enter a US phone number with area code
                     </p>
                   </div>
 
                   {/* Enhanced Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting || !validatePhoneNumber(formData.phone)}
+                    disabled={isSubmitting}
                     className="w-full bg-primary-red text-white px-8 py-5 rounded-lg text-lg font-semibold hover:bg-red-800 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                   >
                     <Download className="w-5 h-5" />
