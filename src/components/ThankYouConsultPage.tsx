@@ -135,10 +135,10 @@ const ThankYouConsultPage: React.FC = () => {
             {/* Enhanced Subheadline */}
             <div className="max-w-2xl mx-auto mb-8">
               <p className="text-xl text-gray-700 leading-relaxed mb-4 font-medium">
-                We're analyzing your business right now—here's what to expect next.
+                Ivan will personally email you within 24 hours to schedule your free marketing analysis.
               </p>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Ivan will personally review your information and get in touch within 24 hours.
+                Check your inbox (and spam folder) for an email from Ivan with available time slots.
               </p>
             </div>
           </div>
@@ -159,10 +159,10 @@ const ThankYouConsultPage: React.FC = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  📧 Step 1
+                  📧 Step 1: Check Your Email
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  <strong>Watch your email</strong>—your analysis arrives in 24 hours.
+                  <strong>Ivan will email you personally</strong> within 24 hours to schedule your analysis call.
                 </p>
               </div>
 
@@ -174,10 +174,10 @@ const ThankYouConsultPage: React.FC = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  📝 Step 2
+                  📞 Step 2: Schedule Your Call
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  <strong>Review your custom growth plan</strong> tailored to your business.
+                  <strong>Pick a time that works for you</strong> from the available slots Ivan provides.
                 </p>
               </div>
 
@@ -189,10 +189,10 @@ const ThankYouConsultPage: React.FC = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  📞 Step 3
+                  📝 Step 3: Get Your Plan
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  <strong>Book your free strategy call</strong> (if you want help implementing).
+                  <strong>Receive your custom growth plan</strong> during your personalized analysis call.
                 </p>
               </div>
             </div>
