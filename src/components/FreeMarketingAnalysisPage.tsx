@@ -10,7 +10,7 @@ const FreeMarketingAnalysisPage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
+    phone: '+1 ',
     companyName: '',
     howDidYouFindUs: '',
     monthlySpend: '',
@@ -36,12 +36,80 @@ const FreeMarketingAnalysisPage: React.FC = () => {
     }));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    // If user deletes everything, reset to +1 
+    if (value === '') {
+      value = '+1 ';
+    }
+    // If user tries to delete the +1 part, prevent it
+    else if (!value.startsWith('+')) {
+      value = '+1 ' + value;
+    }
+    // If user deletes the space after +1, add it back
+    else if (value === '+1') {
+      value = '+1 ';
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      phone: value
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
     
     try {
+      // Validate required fields
+      if (!formData.firstName.trim() || !formData.lastName.trim()) {
+        setError('Please enter your first and last name');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!formData.companyName.trim()) {
+        setError('Please enter your company name');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Send to Zapier webhook
+      const formDataToSend = new FormData();
+      formDataToSend.append('first_name', formData.firstName);
+      formDataToSend.append('last_name', formData.lastName);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone.trim() || '');
+      formDataToSend.append('company_name', formData.companyName);
+      formDataToSend.append('how_did_you_find_us', formData.howDidYouFindUs);
+      formDataToSend.append('monthly_spend', formData.monthlySpend);
+      formDataToSend.append('website', formData.website);
+      formDataToSend.append('source', 'Free Marketing Analysis Page');
+      formDataToSend.append('form_type', 'Marketing Analysis Request');
+      formDataToSend.append('timestamp', new Date().toISOString());
+      formDataToSend.append('page_url', window.location.href);
+      
+      console.log('Sending marketing analysis webhook...');
+      
+      try {
+        const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3cyshm/', {
+          method: 'POST',
+          body: formDataToSend
+        });
+        
+        console.log('Marketing analysis webhook sent - Status:', response.status);
+        
+        if (!response.ok) {
+          console.error('Marketing analysis webhook failed with status:', response.status);
+        }
+      } catch (webhookError) {
+        console.error('Marketing analysis webhook error:', webhookError);
+        // Continue with local storage even if webhook fails
+      }
+
       saveMarketingSubmission({
         first_name: formData.firstName,
         last_name: formData.lastName,
@@ -215,15 +283,14 @@ const FreeMarketingAnalysisPage: React.FC = () => {
                       </div>
                       <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                          Phone *
+                          Phone (optional)
                         </label>
                         <input
                           type="tel"
                           id="phone"
                           name="phone"
-                          required
                           value={formData.phone}
-                          onChange={handleInputChange}
+                          onChange={handlePhoneChange}
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent focus:bg-white transition-colors"
                           disabled={isSubmitting}
                         />
