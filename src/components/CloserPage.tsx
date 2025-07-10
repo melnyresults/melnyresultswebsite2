@@ -38,11 +38,50 @@ const CloserPage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate form submission (you can replace this with actual API call)
-      console.log('Form submitted:', formData);
+      // Validate required fields
+      if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
+        setError('Please fill in all required fields');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!formData.agreeCommission) {
+        setError('You must agree to the commission-only terms');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Send to Zapier webhook
+      const formDataToSend = new FormData();
+      formDataToSend.append('full_name', formData.fullName);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('linkedin', formData.linkedin);
+      formDataToSend.append('sales_experience', formData.salesExperience);
+      formDataToSend.append('why_closer', formData.whyCloser);
+      formDataToSend.append('agree_commission', formData.agreeCommission.toString());
+      formDataToSend.append('source', 'Closer Application Page');
+      formDataToSend.append('form_type', 'Closer Application');
+      formDataToSend.append('timestamp', new Date().toISOString());
+      formDataToSend.append('page_url', window.location.href);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Sending closer application webhook...');
+      
+      try {
+        const response = await fetch('https://hooks.zapier.com/hooks/catch/19293386/u3c28sj/', {
+          method: 'POST',
+          body: formDataToSend
+        });
+        
+        console.log('Closer webhook sent - Status:', response.status);
+        
+        if (!response.ok) {
+          console.error('Closer webhook failed with status:', response.status);
+        }
+      } catch (webhookError) {
+        console.error('Closer webhook error:', webhookError);
+        // Continue with local storage even if webhook fails
+      }
       
       // Store form data in localStorage for potential future use
       localStorage.setItem('closerApplication', JSON.stringify({
