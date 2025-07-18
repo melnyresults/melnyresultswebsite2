@@ -22,6 +22,7 @@ import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
 import GenerativeEngineOptimizationPage from './components/GenerativeEngineOptimizationPage';
 import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngineOptimizationThanksPage';
+import GenerativeEngineOptimizationNThanksPage from './components/GenerativeEngineOptimizationNThanksPage';
 import BlogPublishConfirmation from './components/BlogPublishConfirmation';
 import { usePageMeta } from './hooks/usePageMeta';
 
@@ -111,6 +112,7 @@ function App() {
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/generative-engine-optimization-guide" element={<GenerativeEngineOptimizationPage />} />
         <Route path="/generative-engine-optimization-guide-thanks" element={<GenerativeEngineOptimizationThanksPage />} />
+        <Route path="/generative-engine-optimization-guide-nthanks" element={<GenerativeEngineOptimizationNThanksPage />} />
         <Route 
           path="/admin/dashboard" 
           element={
