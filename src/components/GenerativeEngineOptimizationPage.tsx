@@ -120,7 +120,12 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       });
       
       // Redirect to thank you page
-      navigate('/generative-engine-optimization-guide-thanks');
+      // Route to different thank you pages based on business type
+      if (formData.businessType === 'Marketer' || formData.businessType === 'Agency') {
+        navigate('/generative-engine-optimization-guide-nthanks');
+      } else {
+        navigate('/generative-engine-optimization-guide-thanks');
+      }
     } catch (err) {
       console.error('Form submission error:', err);
       setError('There was an error submitting your request. Please try again.');
