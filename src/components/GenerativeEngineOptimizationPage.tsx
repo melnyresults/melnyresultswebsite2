@@ -6,9 +6,9 @@ import { usePageMeta } from '../hooks/usePageMeta';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
-    phone: '+1 '
+    phone: '+1 ',
+    businessType: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +61,20 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
     
     try {
       // Validate required fields
-      if (!formData.name.trim()) {
-        setError('Please enter your name');
+      if (!formData.email.trim()) {
+        setError('Please enter your email address');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!formData.phone.trim() || formData.phone.trim() === '+1') {
+        setError('Please enter your phone number');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!formData.businessType.trim()) {
+        setError('Please select your business type');
         setIsSubmitting(false);
         return;
       }
@@ -70,9 +82,9 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       // Send to Zapier webhook
       // Create FormData object (not JSON!)
       const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
       formDataToSend.append('email', formData.email);
-      formDataToSend.append('phone', formData.phone.trim() || '');
+      formDataToSend.append('phone', formData.phone.trim());
+      formDataToSend.append('business_type', formData.businessType);
       formDataToSend.append('source', 'GEO Landing Page');
       formDataToSend.append('form_type', 'GEO Guide Download');
       formDataToSend.append('timestamp', new Date().toISOString());
@@ -97,11 +109,11 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
       }
 
       saveMarketingSubmission({
-        first_name: formData.name,
+        first_name: 'GEO Guide',
         last_name: '',
         email: formData.email,
         phone: formData.phone,
-        company_name: 'GEO Guide Download',
+        company_name: formData.businessType,
         how_did_you_find_us: 'GEO Landing Page',
         monthly_spend: 'Unknown',
         website: ''
@@ -158,24 +170,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name Field */}
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                      Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
-                      placeholder="John Doe"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-
                   {/* Enhanced Email Field */}
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-left">
@@ -197,12 +191,13 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                   {/* Enhanced Phone Field */}
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-                      Phone Number (optional)
+                      Phone Number *
                     </label>
                     <input
                       type="tel"
                       id="phone"
                       name="phone"
+                      required
                       value={formData.phone}
                       onChange={handlePhoneChange}
                       className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
@@ -210,8 +205,36 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                       disabled={isSubmitting}
                     />
                     <p className="mt-2 text-xs text-gray-500">
-                      Optional - Enter a US phone number with area code
+                      Enter a US phone number with area code
                     </p>
+                  </div>
+
+                  {/* Business Type Dropdown */}
+                  <div>
+                    <label htmlFor="businessType" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                      What best describes you? *
+                    </label>
+                    <select
+                      id="businessType"
+                      name="businessType"
+                      required
+                      value={formData.businessType}
+                      onChange={handleInputChange}
+                      className="w-full px-6 py-5 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-primary-blue focus:bg-white transition-colors text-lg"
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Select your business type</option>
+                      <option value="Marketer">Marketer</option>
+                      <option value="Agency">Agency</option>
+                      <option value="Trades Business Owner">Trades Business Owner</option>
+                      <option value="Ecommerce">Ecommerce</option>
+                      <option value="SaaS">SaaS</option>
+                      <option value="Professional Services">Professional Services</option>
+                      <option value="Restaurant/Food Service">Restaurant/Food Service</option>
+                      <option value="Real Estate">Real Estate</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
 
                   {/* Enhanced Submit Button */}
@@ -231,26 +254,6 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
                     )}
                   </button>
                 </form>
-              </div>
-
-              {/* Enhanced Trust Bar */}
-              <div className="mt-8 animate-fade-in-up">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100 border-t-2 border-t-gray-200">
-                  <div className="flex justify-center items-center gap-8 py-6 px-4 flex-wrap">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="font-medium">Instant download</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="font-medium">No spam</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="font-medium">100% free</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
