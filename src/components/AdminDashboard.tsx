@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, LogOut, Eye, Calendar, User } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { usePageMeta } from '../hooks/usePageMeta';
+import AdminComments from './AdminComments';
 
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const { posts, loading, deletePost } = useBlogPosts();
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
   
   usePageMeta({
     title: 'Blog Dashboard - Melny Results Admin',
@@ -146,93 +148,128 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Posts Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Blog Posts</h2>
-          <Link
-            to="/admin/posts/new"
-            className="inline-flex items-center px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            New Post
-          </Link>
+        {/* Tab Navigation */}
+        <div className="flex items-center gap-2 mb-8">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('posts')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'posts'
+                  ? 'bg-white text-primary-blue shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Edit className="w-4 h-4" />
+              Blog Posts
+            </button>
+            <button
+              onClick={() => setActiveTab('comments')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'comments'
+                  ? 'bg-white text-primary-blue shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Comments
+            </button>
+          </div>
         </div>
 
-        {/* Posts List */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-          {posts.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No blog posts yet</h3>
-              <p className="text-gray-600 mb-6">Get started by creating your first blog post.</p>
+        {/* Tab Content */}
+        {activeTab === 'posts' ? (
+          <div>
+            {/* Posts Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Blog Posts</h2>
               <Link
                 to="/admin/posts/new"
                 className="inline-flex items-center px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 <Plus className="w-5 h-5 mr-2" />
-                Create First Post
+                New Post
               </Link>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Author
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Published
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {posts.map((post) => (
-                    <tr key={post.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{post.title}</div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">{post.excerpt}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {post.author}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(post.published_at)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <Link
-                            to={`/admin/posts/edit/${post.id}`}
-                            className="text-primary-blue hover:text-blue-700 p-1 rounded hover:bg-blue-50 transition-colors"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Link>
-                          <button
-                            onClick={() => handleDeletePost(post.id)}
-                            disabled={deletingId === post.id}
-                            className="text-red-600 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors disabled:opacity-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+            {/* Posts List */}
+            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+              {posts.length === 0 ? (
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Plus className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No blog posts yet</h3>
+                  <p className="text-gray-600 mb-6">Get started by creating your first blog post.</p>
+                  <Link
+                    to="/admin/posts/new"
+                    className="inline-flex items-center px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Create First Post
+                  </Link>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Title
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Author
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Published
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {posts.map((post) => (
+                        <tr key={post.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{post.title}</div>
+                              <div className="text-sm text-gray-500 truncate max-w-xs">{post.excerpt}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {post.author}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {formatDate(post.published_at)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex space-x-2">
+                              <Link
+                                to={`/admin/posts/edit/${post.id}`}
+                                className="text-primary-blue hover:text-blue-700 p-1 rounded hover:bg-blue-50 transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Link>
+                              <button
+                                onClick={() => handleDeletePost(post.id)}
+                                disabled={deletingId === post.id}
+                                className="text-red-600 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors disabled:opacity-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <AdminComments token={user?.token || ''} />
+        )}
       </main>
     </div>
   );
