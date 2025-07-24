@@ -9,6 +9,9 @@ const BlogPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const { posts, loading } = useBlogPosts();
+
+  // Production domain configuration
+  const PRODUCTION_DOMAIN = 'https://melnyresults.com';
   
   usePageMeta({
     title: 'Marketing Blog - Melny Results',
@@ -16,6 +19,7 @@ const BlogPage: React.FC = () => {
     keywords: 'marketing blog, business growth tips, marketing strategies, lead generation, digital marketing insights',
     ogTitle: 'Marketing Insights That Actually Work - Melny Results Blog',
     ogDescription: 'No fluff. No theory. Just proven strategies to grow your business faster.',
+    canonicalUrl: `${PRODUCTION_DOMAIN}/blog`,
   });
 
   const categories = ['Growth Strategies', 'Success Stories', 'Tips', 'Case Studies'];

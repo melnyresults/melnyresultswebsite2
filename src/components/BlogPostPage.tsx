@@ -19,6 +19,9 @@ const BlogPostPage: React.FC = () => {
   const navigate = useNavigate();
   const { posts, likePost } = useBlogPosts();
 
+  // Production domain configuration
+  const PRODUCTION_DOMAIN = 'https://melnyresults.com';
+
   useEffect(() => {
     if (posts.length > 0 && slug) {
       const slugParts = slug.split('-');
@@ -47,6 +50,9 @@ const BlogPostPage: React.FC = () => {
     }
   }, [posts, slug]);
   
+  // Generate canonical URL for the current post
+  const canonicalUrl = post && slug ? `${PRODUCTION_DOMAIN}/blog/${slug}` : `${PRODUCTION_DOMAIN}/blog`;
+
   // Update meta tags when post is loaded
   usePageMeta({
     title: post ? `${post.title} - Melny Results Blog` : 'Post Not Found - Melny Results',
@@ -55,6 +61,7 @@ const BlogPostPage: React.FC = () => {
     ogTitle: post ? post.title : 'Post Not Found',
     ogDescription: post ? (post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
     ogImage: post?.image_url,
+    canonicalUrl: canonicalUrl,
   });
 
   // Scroll spy for table of contents

@@ -7,6 +7,7 @@ interface PageMetaData {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  canonicalUrl?: string;
 }
 
 export const usePageMeta = (meta: PageMetaData) => {
@@ -49,6 +50,17 @@ export const usePageMeta = (meta: PageMetaData) => {
       if (ogImage) {
         ogImage.setAttribute('content', meta.ogImage);
       }
+    }
+
+    // Update canonical URL
+    if (meta.canonicalUrl) {
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute('href', meta.canonicalUrl);
     }
 
     // Update Twitter title

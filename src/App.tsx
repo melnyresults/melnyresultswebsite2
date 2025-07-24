@@ -79,6 +79,7 @@ function HomePage() {
     keywords: 'marketing agency, digital marketing, lead generation, business growth, marketing strategy, guaranteed results',
     ogTitle: 'Melny Results - More Growth. More Clients. Guaranteed.',
     ogDescription: 'No contracts. No fluff. Just results — or you owe us nothing. Get your free growth plan today.',
+    canonicalUrl: 'https://melnyresults.com/',
   });
   
   return (
