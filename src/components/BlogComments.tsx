@@ -28,7 +28,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // API configuration
-  const API_BASE_URL = 'http://localhost:3001';
+  const API_BASE_URL = '';
 
   useEffect(() => {
     fetchComments();

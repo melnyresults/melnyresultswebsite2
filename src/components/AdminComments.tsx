@@ -22,7 +22,7 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
 
-  const API_BASE_URL = 'http://localhost:3001';
+  const API_BASE_URL = '';
 
   useEffect(() => {
     fetchComments();
