@@ -22,9 +22,7 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
 
-  const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://api.melnyresults.com' 
-    : 'http://localhost:3001';
+  const API_BASE_URL = 'http://localhost:3001';
 
   useEffect(() => {
     fetchComments();
@@ -34,17 +32,27 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/comments?status=${filter}`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       if (data.success) {
         setComments(data.comments);
+      } else {
+        console.error('Failed to fetch comments:', data.error);
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
+      // Set empty array if API fails
+      setComments([]);
     } finally {
       setLoading(false);
     }

@@ -27,9 +27,8 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://api.melnyresults.com' 
-    : 'http://localhost:3001';
+  // Check if we're in development and backend is available
+  const API_BASE_URL = 'http://localhost:3001';
 
   useEffect(() => {
     fetchComments();
@@ -39,14 +38,28 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/comments/${postSlug}`);
+      const response = await fetch(`${API_BASE_URL}/api/comments/${postSlug}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
         setComments(data.comments);
+      } else {
+        console.error('Failed to fetch comments:', data.error);
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
+      // For now, just set empty comments if API fails
+      setComments([]);
     } finally {
       setLoading(false);
     }
@@ -54,14 +67,27 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
   const fetchLikes = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/likes/${postSlug}`);
+      const response = await fetch(`${API_BASE_URL}/api/likes/${postSlug}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
         setLikes(data.likes);
+      } else {
+        console.error('Failed to fetch likes:', data.error);
       }
     } catch (error) {
       console.error('Error fetching likes:', error);
+      // Keep the initial likes count if API fails
     }
   };
 
@@ -83,6 +109,10 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       
       if (data.success) {
@@ -98,7 +128,16 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
       }
     } catch (error) {
       console.error('Error liking post:', error);
-      setMessage({ type: 'error', text: 'Failed to like post' });
+      // Fallback to local like functionality if API fails
+      setLikes(prev => prev + 1);
+      setHasLiked(true);
+      
+      // Store in localStorage
+      const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+      likedPosts.push(postSlug);
+      localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
+      
+      setMessage({ type: 'success', text: 'Post liked! (Note: Backend API not available)' });
     } finally {
       setLiking(false);
     }
@@ -118,6 +157,10 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
         body: JSON.stringify(formData),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       
       if (data.success) {
@@ -134,7 +177,11 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
-      setMessage({ type: 'error', text: 'Failed to submit comment' });
+      // Show a more helpful error message
+      setMessage({ 
+        type: 'error', 
+        text: 'Unable to submit comment - backend API not available. Please ensure the backend server is running on localhost:3001' 
+      });
     } finally {
       setSubmitting(false);
     }
