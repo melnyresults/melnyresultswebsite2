@@ -27,7 +27,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Check if we're in development and backend is available
+  // API configuration
   const API_BASE_URL = 'http://localhost:3001';
 
   useEffect(() => {
@@ -40,6 +40,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
     try {
       const response = await fetch(`${API_BASE_URL}/api/comments/${postSlug}`, {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -69,6 +70,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
     try {
       const response = await fetch(`${API_BASE_URL}/api/likes/${postSlug}`, {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -104,6 +106,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
     try {
       const response = await fetch(`${API_BASE_URL}/api/likes/${postSlug}/like`, {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -151,6 +154,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
     try {
       const response = await fetch(`${API_BASE_URL}/api/comments/${postSlug}`, {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
