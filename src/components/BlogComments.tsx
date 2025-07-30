@@ -177,11 +177,18 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
-      // Show a more helpful error message
-      setMessage({ 
-        type: 'error', 
-        text: 'Unable to submit comment - backend API not available. Please ensure the backend server is running on localhost:3001' 
-      });
+      // Check if it's a network error (backend not running)
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        setMessage({ 
+          type: 'error', 
+          text: 'Unable to connect to server. Please try again later or contact support if the problem persists.' 
+        });
+      } else {
+        setMessage({ 
+          type: 'error', 
+          text: 'Failed to submit comment. Please try again.' 
+        });
+      }
     } finally {
       setSubmitting(false);
     }
