@@ -24,6 +24,7 @@ import GenerativeEngineOptimizationPage from './components/GenerativeEngineOptim
 import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngineOptimizationThanksPage';
 import GenerativeEngineOptimizationNThanksPage from './components/GenerativeEngineOptimizationNThanksPage';
 import BlogPublishConfirmation from './components/BlogPublishConfirmation';
+import MelnyPage from './components/MelnyPage';
 import { usePageMeta } from './hooks/usePageMeta';
 
 // Component to handle scroll to top on route change
@@ -114,6 +115,7 @@ function App() {
         <Route path="/generative-engine-optimization-guide" element={<GenerativeEngineOptimizationPage />} />
         <Route path="/generative-engine-optimization-guide-thanks" element={<GenerativeEngineOptimizationThanksPage />} />
         <Route path="/generative-engine-optimization-guide-nthanks" element={<GenerativeEngineOptimizationNThanksPage />} />
+        <Route path="/melny" element={<MelnyPage />} />
         <Route 
           path="/admin/dashboard" 
           element={
