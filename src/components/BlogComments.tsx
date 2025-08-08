@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Send, User, Calendar, Heart } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface Comment {
   id: number;
-  author: string;
+  author_name: string;
   content: string;
-  createdAt: string;
+  created_at: string;
 }
 
 interface BlogCommentsProps {
@@ -27,9 +28,6 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // API configuration
-  const API_BASE_URL = '';
-
   useEffect(() => {
     fetchComments();
     fetchLikes();
@@ -38,28 +36,17 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/comments/${postSlug}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setComments(data.comments);
-      } else {
-        console.error('Failed to fetch comments:', data.error);
-      }
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('id, author_name, content, created_at')
+        .eq('post_slug', postSlug)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setComments(data || []);
     } catch (error) {
       console.error('Error fetching comments:', error);
-      // For now, just set empty comments if API fails
       setComments([]);
     } finally {
       setLoading(false);
@@ -68,33 +55,19 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
   const fetchLikes = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/likes/${postSlug}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setLikes(data.likes);
-      } else {
-        console.error('Failed to fetch likes:', data.error);
-      }
+      const { count, error } = await supabase
+        .from('blog_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_slug', postSlug);
+
+      if (error) throw error;
+      setLikes(count || 0);
     } catch (error) {
       console.error('Error fetching likes:', error);
-      // Keep the initial likes count if API fails
     }
   };
 
   const checkIfLiked = () => {
-    // Check localStorage to see if user has liked this post
     const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
     setHasLiked(likedPosts.includes(postSlug));
   };
@@ -104,43 +77,21 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
     setLiking(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/likes/${postSlug}/like`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const { error } = await supabase
+        .from('blog_likes')
+        .insert([{ post_slug: postSlug }]);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (error) throw error;
 
-      const data = await response.json();
-      
-      if (data.success) {
-        setLikes(data.likes);
-        setHasLiked(true);
-        
-        // Store in localStorage
-        const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
-        likedPosts.push(postSlug);
-        localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
-      } else {
-        setMessage({ type: 'error', text: data.error || 'Failed to like post' });
-      }
-    } catch (error) {
-      console.error('Error liking post:', error);
-      // Fallback to local like functionality if API fails
       setLikes(prev => prev + 1);
       setHasLiked(true);
       
-      // Store in localStorage
       const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
       likedPosts.push(postSlug);
       localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
-      
-      setMessage({ type: 'success', text: 'Post liked! (Note: Backend API not available)' });
+    } catch (error) {
+      console.error('Error liking post:', error);
+      setMessage({ type: 'error', text: 'Failed to like post. Please try again.' });
     } finally {
       setLiking(false);
     }
@@ -152,47 +103,29 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
     setMessage(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/comments/${postSlug}`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      const { error } = await supabase
+        .from('blog_comments')
+        .insert([{
+          post_slug: postSlug,
+          author_name: formData.author_name,
+          author_email: formData.author_email,
+          content: formData.content,
+          status: 'pending'
+        }]);
+
+      if (error) throw error;
+
+      setMessage({ 
+        type: 'success', 
+        text: 'Comment submitted successfully! It will appear after approval.' 
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setMessage({ 
-          type: 'success', 
-          text: 'Comment submitted successfully! It will appear after approval.' 
-        });
-        setFormData({ author_name: '', author_email: '', content: '' });
-      } else {
-        setMessage({ 
-          type: 'error', 
-          text: data.errors?.[0]?.msg || 'Failed to submit comment' 
-        });
-      }
+      setFormData({ author_name: '', author_email: '', content: '' });
     } catch (error) {
       console.error('Error submitting comment:', error);
-      // Check if it's a network error (backend not running)
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        setMessage({ 
-          type: 'error', 
-          text: 'Unable to connect to server. Please try again later or contact support if the problem persists.' 
-        });
-      } else {
-        setMessage({ 
-          type: 'error', 
-          text: 'Failed to submit comment. Please try again.' 
-        });
-      }
+      setMessage({ 
+        type: 'error', 
+        text: 'Failed to submit comment. Please try again.' 
+      });
     } finally {
       setSubmitting(false);
     }
@@ -344,10 +277,10 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h5 className="font-medium text-gray-900">{comment.author}</h5>
+                      <h5 className="font-medium text-gray-900">{comment.author_name}</h5>
                       <div className="flex items-center gap-1 text-sm text-gray-500">
                         <Calendar className="w-4 h-4" />
-                        <span>{formatDate(comment.createdAt)}</span>
+                        <span>{formatDate(comment.created_at)}</span>
                       </div>
                     </div>
                     <p className="text-gray-700 leading-relaxed">{comment.content}</p>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Check, Trash2, Eye, Calendar, User, Filter } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface Comment {
   id: number;
@@ -7,22 +8,19 @@ interface Comment {
   author_name: string;
   author_email: string;
   content: string;
-  ip_address: string;
   status: 'pending' | 'approved';
   created_at: string;
 }
 
 interface AdminCommentsProps {
-  token: string;
+  token?: string;
 }
 
-const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
+const AdminComments: React.FC<AdminCommentsProps> = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
-
-  const API_BASE_URL = '';
 
   useEffect(() => {
     fetchComments();
@@ -31,27 +29,21 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/comments?status=${filter}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      let query = supabase
+        .from('blog_comments')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (filter !== 'all') {
+        query = query.eq('status', filter);
       }
 
-      const data = await response.json();
-      if (data.success) {
-        setComments(data.comments);
-      } else {
-        console.error('Failed to fetch comments:', data.error);
-      }
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setComments(data || []);
     } catch (error) {
       console.error('Error fetching comments:', error);
-      // Set empty array if API fails
       setComments([]);
     } finally {
       setLoading(false);
@@ -62,23 +54,20 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
     setProcessingIds(prev => new Set(prev).add(id));
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/comments/${id}/approve`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const { error } = await supabase
+        .from('blog_comments')
+        .update({ status: 'approved' })
+        .eq('id', id);
 
-      const data = await response.json();
-      if (data.success) {
-        setComments(prev => 
-          prev.map(comment => 
-            comment.id === id 
-              ? { ...comment, status: 'approved' as const }
-              : comment
-          )
-        );
-      }
+      if (error) throw error;
+
+      setComments(prev => 
+        prev.map(comment => 
+          comment.id === id 
+            ? { ...comment, status: 'approved' as const }
+            : comment
+        )
+      );
     } catch (error) {
       console.error('Error approving comment:', error);
     } finally {
@@ -96,17 +85,13 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
     setProcessingIds(prev => new Set(prev).add(id));
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/comments/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const { error } = await supabase
+        .from('blog_comments')
+        .delete()
+        .eq('id', id);
 
-      const data = await response.json();
-      if (data.success) {
-        setComments(prev => prev.filter(comment => comment.id !== id));
-      }
+      if (error) throw error;
+      setComments(prev => prev.filter(comment => comment.id !== id));
     } catch (error) {
       console.error('Error deleting comment:', error);
     } finally {
@@ -229,7 +214,6 @@ const AdminComments: React.FC<AdminCommentsProps> = ({ token }) => {
                     <span>{formatDate(comment.created_at)}</span>
                   </div>
                   <span>Post: {comment.post_slug}</span>
-                  <span>IP: {comment.ip_address}</span>
                 </div>
               </div>
 
