@@ -1,13 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim()
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim()
 
 // Use placeholder values during development if env vars are not set
-const defaultUrl = supabaseUrl || 'https://placeholder.supabase.co'
-const defaultKey = supabaseAnonKey || 'placeholder-anon-key'
+const defaultUrl = (supabaseUrl && supabaseUrl !== '') ? supabaseUrl : 'https://placeholder.supabase.co'
+const defaultKey = (supabaseAnonKey && supabaseAnonKey !== '') ? supabaseAnonKey : 'placeholder-anon-key'
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || supabaseUrl === '' || !supabaseAnonKey || supabaseAnonKey === '') {
   console.warn('⚠️  Supabase environment variables not configured. Please set up your .env file with actual Supabase credentials.')
 }
 
