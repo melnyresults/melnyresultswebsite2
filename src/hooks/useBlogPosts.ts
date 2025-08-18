@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { getBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost, likeBlogPost, getLikedPosts, initializeSampleData } from '../lib/localStorage';
 
 export type BlogPost = {
   id: string;
@@ -22,20 +22,12 @@ export const useBlogPosts = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('published_at', { ascending: false });
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      // Fallback to localStorage for development
-      const { initializeSampleData, getBlogPosts } = await import('../lib/localStorage');
       initializeSampleData();
       const blogPosts = getBlogPosts();
       setPosts(blogPosts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      setPosts([]);
     } finally {
       setLoading(false);
     }
@@ -45,50 +37,29 @@ export const useBlogPosts = () => {
     fetchPosts();
   }, []);
 
-  const createBlogPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
+  const createPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
     try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .insert([{
-          ...postData,
-          likes_count: 0
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
+      const newPost = createBlogPost(postData);
       await fetchPosts();
-      return { data, error: null };
+      return { data: newPost, error: null };
     } catch (err) {
       return { data: null, error: err instanceof Error ? err.message : 'An error occurred' };
     }
   };
 
-  const updateBlogPost = async (id: string, postData: Partial<BlogPost>) => {
+  const updatePost = async (id: string, postData: Partial<BlogPost>) => {
     try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .update(postData)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const updatedPost = updateBlogPost(id, postData);
       await fetchPosts();
-      return { data, error: null };
+      return { data: updatedPost, error: null };
     } catch (err) {
       return { data: null, error: err instanceof Error ? err.message : 'An error occurred' };
     }
   };
 
-  const deleteBlogPost = async (id: string) => {
+  const deletePost = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      deleteBlogPost(id);
       await fetchPosts();
       return { error: null };
     } catch (err) {
@@ -98,57 +69,12 @@ export const useBlogPosts = () => {
 
   const likePost = async (postId: string) => {
     try {
-      // Check if user already liked this post (using localStorage for now)
-      const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+      const likedPosts = getLikedPosts();
       if (likedPosts.includes(postId)) {
         return { error: 'You have already liked this post' };
       }
 
-      // Insert like record
-      const { error: likeError } = await supabase
-        .from('post_likes')
-        .insert([{ post_id: postId }]);
-
-      if (likeError) throw likeError;
-
-      // Update likes count
-      const { error: updateError } = await supabase
-        .rpc('increment_post_likes', { post_id: postId });
-
-      if (updateError) throw updateError;
-
-      // Store in localStorage to prevent duplicate likes
-      likedPosts.push(postId);
-      localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
-
-      await fetchPosts();
-      return { error: null };
-    } catch (err) {
-      return { error: err instanceof Error ? err.message : 'An error occurred' };
-    }
-  };
-
-  const unlikePost = async (postId: string) => {
-    try {
-      // Remove like record
-      const { error: unlikeError } = await supabase
-        .from('post_likes')
-        .delete()
-        .eq('post_id', postId);
-
-      if (unlikeError) throw unlikeError;
-
-      // Update likes count
-      const { error: updateError } = await supabase
-        .rpc('decrement_post_likes', { post_id: postId });
-
-      if (updateError) throw updateError;
-
-      // Remove from localStorage
-      const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
-      const updatedLikedPosts = likedPosts.filter((id: string) => id !== postId);
-      localStorage.setItem('liked_posts', JSON.stringify(updatedLikedPosts));
-
+      likeBlogPost(postId);
       await fetchPosts();
       return { error: null };
     } catch (err) {
@@ -160,11 +86,10 @@ export const useBlogPosts = () => {
     posts,
     loading,
     error,
-    createPost: createBlogPost,
-    updatePost: updateBlogPost,
-    deletePost: deleteBlogPost,
+    createPost,
+    updatePost,
+    deletePost,
     likePost,
-    unlikePost,
     refetch: fetchPosts,
   };
 };

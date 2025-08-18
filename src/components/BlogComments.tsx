@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Send, User, Calendar, Heart } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { likeBlogPost, getLikedPosts } from '../lib/localStorage';
 
 interface Comment {
   id: number;
@@ -18,57 +18,21 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
   const [comments, setComments] = useState<Comment[]>([]);
   const [likes, setLikes] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [liking, setLiking] = useState(false);
   const [formData, setFormData] = useState({
     author_name: '',
     author_email: '',
     content: ''
   });
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    fetchComments();
-    fetchLikes();
     checkIfLiked();
+    setLoading(false);
   }, [postSlug]);
 
-  const fetchComments = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('blog_comments')
-        .select('id, author_name, content, created_at')
-        .eq('post_slug', postSlug)
-        .eq('status', 'approved')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setComments(data || []);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      setComments([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchLikes = async () => {
-    try {
-      const { count, error } = await supabase
-        .from('blog_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('post_slug', postSlug);
-
-      if (error) throw error;
-      setLikes(count || 0);
-    } catch (error) {
-      console.error('Error fetching likes:', error);
-    }
-  };
-
   const checkIfLiked = () => {
-    const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+    const likedPosts = getLikedPosts();
     setHasLiked(likedPosts.includes(postSlug));
   };
 
@@ -77,21 +41,11 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
     setLiking(true);
     try {
-      const { error } = await supabase
-        .from('blog_likes')
-        .insert([{ post_slug: postSlug }]);
-
-      if (error) throw error;
-
+      likeBlogPost(postSlug);
       setLikes(prev => prev + 1);
       setHasLiked(true);
-      
-      const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
-      likedPosts.push(postSlug);
-      localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
     } catch (error) {
       console.error('Error liking post:', error);
-      setMessage({ type: 'error', text: 'Failed to like post. Please try again.' });
     } finally {
       setLiking(false);
     }
@@ -99,51 +53,12 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    setMessage(null);
-
-    try {
-      const { error } = await supabase
-        .from('blog_comments')
-        .insert([{
-          post_slug: postSlug,
-          author_name: formData.author_name,
-          author_email: formData.author_email,
-          content: formData.content,
-          status: 'pending'
-        }]);
-
-      if (error) throw error;
-
-      setMessage({ 
-        type: 'success', 
-        text: 'Comment submitted successfully! It will appear after approval.' 
-      });
-      setFormData({ author_name: '', author_email: '', content: '' });
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-      setMessage({ 
-        type: 'error', 
-        text: 'Failed to submit comment. Please try again.' 
-      });
-    } finally {
-      setSubmitting(false);
-    }
+    // Comments are currently disabled - focusing on frontend visuals
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   };
 
   return (
@@ -178,17 +93,11 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
         <div className="bg-gray-50 p-6 rounded-2xl">
           <h4 className="text-lg font-medium text-gray-900 mb-4">Leave a Comment</h4>
           
-          {message && (
-            <div className={`mb-4 p-4 rounded-lg ${
-              message.type === 'success' 
-                ? 'bg-green-50 text-green-700 border border-green-200' 
-                : 'bg-red-50 text-red-700 border border-red-200'
-            }`}>
-              {message.text}
-            </div>
-          )}
+          <div className="mb-4 p-4 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+            Comments are currently disabled while we focus on improving the site experience.
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 opacity-50 pointer-events-none">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="author_name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -203,7 +112,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                   placeholder="Your name"
-                  disabled={submitting}
+                  disabled
                 />
               </div>
               <div>
@@ -219,7 +128,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                   placeholder="your@email.com"
-                  disabled={submitting}
+                  disabled
                 />
               </div>
             </div>
@@ -237,23 +146,19 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent resize-none"
                 placeholder="Share your thoughts..."
-                disabled={submitting}
+                disabled
               />
             </div>
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />
-              {submitting ? 'Submitting...' : 'Submit Comment'}
+              Submit Comment
             </button>
           </form>
-
-          <p className="mt-4 text-sm text-gray-500">
-            Your email will not be published. Comments are moderated and will appear after approval.
-          </p>
         </div>
 
         {/* Comments List */}
@@ -263,31 +168,11 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue mx-auto mb-4"></div>
               <p className="text-gray-600">Loading comments...</p>
             </div>
-          ) : comments.length === 0 ? (
+          ) : (
             <div className="text-center py-8 bg-gray-50 rounded-2xl">
               <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No comments yet. Be the first to share your thoughts!</p>
+              <p className="text-gray-600">Comments are temporarily disabled while we improve the site.</p>
             </div>
-          ) : (
-            comments.map((comment) => (
-              <div key={comment.id} className="bg-white p-6 rounded-2xl border border-gray-200">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h5 className="font-medium text-gray-900">{comment.author_name}</h5>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDate(comment.created_at)}</span>
-                      </div>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed">{comment.content}</p>
-                  </div>
-                </div>
-              </div>
-            ))
           )}
         </div>
       </div>
