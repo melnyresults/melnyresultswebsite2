@@ -34,7 +34,7 @@ const FeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section id="services" className="py-20 bg-white">
+    <section id="services" className="py-20" style={{ backgroundColor: '#efebe5' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-semibold text-gray-900 mb-8">
@@ -46,7 +46,8 @@ const FeaturesSection: React.FC = () => {
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="group p-6 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+              className="group p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+              style={{ backgroundColor: '#f7f2ea' }}
               style={{animationDelay: `${index * 0.1}s`}}
             >
               <div className="flex flex-col items-center text-center">
