@@ -47,7 +47,7 @@ const FeaturesSection: React.FC = () => {
             <div 
               key={index}
               className="group p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
-              style={{ backgroundColor: '#f7f2ea' }}
+              style={{ backgroundColor: '#fbf1e5' }}
               style={{animationDelay: `${index * 0.1}s`}}
             >
               <div className="flex flex-col items-center text-center">
