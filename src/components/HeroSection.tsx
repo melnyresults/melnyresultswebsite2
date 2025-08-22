@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="pt-32 pb-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden relative">
+    <section className="pt-48 pb-40 bg-gradient-to-b from-gray-50 to-white overflow-hidden relative">
       {/* SEO H1 - Hidden but accessible to search engines */}
       <h1 className="sr-only">
-        Melny Results - We'll Fill Your Calendar with New Customers in 30 Days - Guaranteed
+        Melny Results - Marketing Agency That Guarantees More Growth and More Clients
       </h1>
       
       {/* Background Geometric Pattern */}
@@ -19,46 +19,33 @@ const HeroSection: React.FC = () => {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-4xl mx-auto text-center">
           {/* Content */}
-          <div className="animate-slide-up text-left">
-            <h2 className="text-4xl lg:text-5xl font-semibold text-gray-900 leading-tight mb-6">
-              We'll Fill Your Calendar with New Customers in 30 Days -{' '}
+          <div className="animate-slide-up">
+            <h2 className="text-6xl lg:text-7xl font-semibold text-gray-900 leading-tight mb-6">
+              More Growth. More Clients.{' '}
               <span className="text-primary-red">Guaranteed.</span>
             </h2>
             
-            <p className="text-lg text-gray-600 leading-relaxed mb-8">
-              <strong>Stop waiting for customers to find you.</strong>
-            </p>
-            <p className="text-lg text-gray-600 leading-relaxed mb-12">
-              We put your business in front of locals actively searching for your services - starting this month.
+            <p className="text-xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
+              And this time, you won't be burned. We don't get paid unless you win. 
+              No contracts. No fluff. Just results — or you owe us nothing.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
               <Link
                 to="/free-marketing-analysis"
-                className="inline-flex items-center justify-center bg-primary-red text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl"
+                className="inline-flex items-center justify-center bg-primary-red text-white px-10 py-5 rounded-full text-lg font-semibold hover:bg-red-700 transition-all duration-200 hover:scale-105 shadow-xl hover:shadow-2xl"
               >
-                <Phone className="w-5 h-5 mr-2" />
-                Book a Call
+                <Rocket className="w-5 h-5 mr-2" />
+                Get My Free Growth Plan Now
               </Link>
             </div>
-          </div>
-
-          {/* Video Section */}
-          <div className="animate-slide-up">
-            <div className="bg-white p-4 rounded-2xl shadow-xl">
-              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full rounded-lg"
-                  src="https://www.youtube.com/embed/aUJI02OenUg"
-                  title="Melny Results - Customer Growth Video"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            </div>
+            
+            <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
+              <span className="w-2 h-2 bg-primary-red rounded-full animate-bounce-gentle"></span>
+              Only 5 free plans available this month. No obligations. No risk. Just results.
+            </p>
           </div>
         </div>
       </div>
