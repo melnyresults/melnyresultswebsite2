@@ -4,7 +4,17 @@ import { Search, Users, MapPin } from 'lucide-react';
 const FeaturesSection: React.FC = () => {
   const features = [
     {
-      icon: <Search className="w-8 h-8" />,
+      icon: (
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="w-16 h-16 rounded-lg object-cover"
+        >
+          <source src="https://framerusercontent.com/assets/WXvY7G3Uj0EvURAFFTjGY6wbe1c.mp4" type="video/mp4" />
+        </video>
+      ),
       title: "Ads To Get To The Top Of Google",
       description: "Show up when locals search for what you offer"
     },
