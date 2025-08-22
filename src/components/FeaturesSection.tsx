@@ -10,23 +10,26 @@ const FeaturesSection: React.FC = () => {
           loop 
           muted 
           playsInline 
-          className="w-16 h-16 rounded-lg object-cover"
+          className="w-32 h-24 rounded-lg object-cover"
         >
           <source src="https://framerusercontent.com/assets/WXvY7G3Uj0EvURAFFTjGY6wbe1c.mp4" type="video/mp4" />
         </video>
       ),
       title: "Ads To Get To The Top Of Google",
-      description: "Show up when locals search for what you offer"
+      description: "Show up when locals search for what you offer",
+      isVideo: true
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: "FB/IG Ads To Reach EVERY Local Client",
-      description: "Be everywhere. Google, Instagram, Facebook, YouTube…"
+      description: "Be everywhere. Google, Instagram, Facebook, YouTube…",
+      isVideo: false
     },
     {
       icon: <MapPin className="w-8 h-8" />,
       title: "Reach Number 1 On Google For Free",
-      description: "Be the #1 on Google Maps organically."
+      description: "Be the #1 on Google Maps organically.",
+      isVideo: false
     }
   ];
 
@@ -47,10 +50,20 @@ const FeaturesSection: React.FC = () => {
               style={{animationDelay: `${index * 0.1}s`}}
             >
               <div className="flex flex-col items-center text-center">
-                <div className="mb-4 p-3 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors duration-300">
-                  <div className="text-primary-blue group-hover:text-blue-800 transition-colors duration-300">
+                {feature.isVideo ? (
+                  <div className="mb-6">
                     {feature.icon}
                   </div>
+                ) : (
+                  <div className="mb-4 p-3 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors duration-300">
+                    <div className="text-primary-blue group-hover:text-blue-800 transition-colors duration-300">
+                      {feature.icon}
+                    </div>
+                  </div>
+                )}
+              ) : (
+                <div className="mb-6">
+                  {feature.icon}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {feature.title}
