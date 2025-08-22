@@ -63,8 +63,6 @@ const ComparisonSection: React.FC = () => {
   );
 };
 
-export default ComparisonSection;
-
 const FAQSection: React.FC = () => {
   const faqs = [
     {
