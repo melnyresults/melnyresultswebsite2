@@ -61,7 +61,6 @@ const FeaturesSection: React.FC = () => {
                     </div>
                   </div>
                 )}
-                )}
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {feature.title}
                 </h3>
