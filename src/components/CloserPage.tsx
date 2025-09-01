@@ -83,11 +83,24 @@ const CloserPage: React.FC = () => {
         // Continue with local storage even if webhook fails
       }
       
-      // Store form data in localStorage for potential future use
-      localStorage.setItem('closerApplication', JSON.stringify({
-        ...formData,
-        submittedAt: new Date().toISOString()
-      }));
+      // Save to Supabase
+      const { error: dbError } = await supabase
+        .from('marketing_submissions')
+        .insert([{
+          first_name: formData.fullName.split(' ')[0] || formData.fullName,
+          last_name: formData.fullName.split(' ').slice(1).join(' ') || '',
+          email: formData.email,
+          phone: formData.phone,
+          company_name: 'Closer Application',
+          how_did_you_find_us: 'Closer Page',
+          monthly_spend: 'N/A',
+          website: formData.linkedin
+        }]);
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        // Continue to thank you page even if DB fails
+      }
       
       // Redirect to thank you page
       navigate('/closer/thank-you');

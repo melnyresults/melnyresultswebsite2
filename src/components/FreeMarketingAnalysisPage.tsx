@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Clipboard, Shield, Star, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { saveMarketingSubmission } from '../lib/localStorage';
+import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 
 const FreeMarketingAnalysisPage: React.FC = () => {
@@ -110,16 +110,24 @@ const FreeMarketingAnalysisPage: React.FC = () => {
         // Continue with local storage even if webhook fails
       }
 
-      saveMarketingSubmission({
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        company_name: formData.companyName,
-        how_did_you_find_us: formData.howDidYouFindUs,
-        monthly_spend: formData.monthlySpend,
-        website: formData.website
-      });
+      // Save to Supabase
+      const { error: dbError } = await supabase
+        .from('marketing_submissions')
+        .insert([{
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          company_name: formData.companyName,
+          how_did_you_find_us: formData.howDidYouFindUs,
+          monthly_spend: formData.monthlySpend,
+          website: formData.website
+        }]);
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        // Continue to thank you page even if DB fails
+      }
       
       // Redirect to thank you page
       navigate('/thankyou-consult');

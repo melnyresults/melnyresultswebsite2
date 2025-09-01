@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle, Lock, Download } from 'lucide-react';
-import { saveMarketingSubmission } from '../lib/localStorage';
+import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 
 const GenerativeEngineOptimizationPage: React.FC = () => {
@@ -108,16 +108,24 @@ const GenerativeEngineOptimizationPage: React.FC = () => {
         // Continue with local storage even if webhook fails
       }
 
-      saveMarketingSubmission({
-        first_name: 'GEO Guide',
-        last_name: '',
-        email: formData.email,
-        phone: formData.phone,
-        company_name: formData.businessType,
-        how_did_you_find_us: 'GEO Landing Page',
-        monthly_spend: 'Unknown',
-        website: ''
-      });
+      // Save to Supabase
+      const { error: dbError } = await supabase
+        .from('marketing_submissions')
+        .insert([{
+          first_name: 'GEO Guide',
+          last_name: '',
+          email: formData.email,
+          phone: formData.phone,
+          company_name: formData.businessType,
+          how_did_you_find_us: 'GEO Landing Page',
+          monthly_spend: 'Unknown',
+          website: ''
+        }]);
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        // Continue to thank you page even if DB fails
+      }
       
       // Redirect to thank you page
       // Route to different thank you pages based on business type

@@ -1,21 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase configuration - credentials are handled securely via Edge Functions
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Supabase configuration
+const supabaseUrl = 'https://czgrvkyqsblqhehfjlkw.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6Z3J2a3lxc2JscWhlaGZqbGt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NDI2ODQsImV4cCI6MjA3MjMxODY4NH0.HxdFdqTWqseOt8Wnn9wYHj9xJ-q93k0XDCfxi4h5PgU'
 
-// Validate environment variables
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables');
-  // Don't throw error, just log it for development
-}
-// Only create client if we have the required variables
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Note: Authentication is handled via Edge Functions for security
-// No auth API exposed here to prevent credential leakage
 
 // Database Types
 export interface BlogPost {

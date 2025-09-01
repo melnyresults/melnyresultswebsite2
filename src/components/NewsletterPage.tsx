@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X as CloseIcon, CheckCircle, Mail, ArrowRight, Lock, Users, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { saveNewsletterSignup } from '../lib/localStorage';
+import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 
 const NewsletterPage: React.FC = () => {
@@ -68,10 +68,18 @@ const NewsletterPage: React.FC = () => {
         // Continue with local storage even if webhook fails
       }
 
-      const result = saveNewsletterSignup(formData.email);
+      // Save to Supabase
+      const { error: dbError } = await supabase
+        .from('newsletter_signups')
+        .insert([{ email: formData.email.trim() }]);
       
-      if (!result.success) {
-        setError(result.error || 'Failed to sign up for newsletter');
+      if (dbError) {
+        if (dbError.code === '23505') { // Unique constraint violation
+          setError('This email is already subscribed to our newsletter.');
+        } else {
+          console.error('Database error:', dbError);
+          setError('Failed to sign up for newsletter. Please try again.');
+        }
       } else {
         // Redirect to thank you page
         navigate('/newsletter/thank-you');

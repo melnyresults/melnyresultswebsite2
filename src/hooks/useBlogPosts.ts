@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost, likeBlogPost, getLikedPosts, initializeSampleData } from '../lib/localStorage';
+import { supabase } from '../lib/supabase';
 
 export type BlogPost = {
   id: string;
@@ -22,9 +22,17 @@ export const useBlogPosts = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      initializeSampleData();
-      const blogPosts = getBlogPosts();
-      setPosts(blogPosts);
+      
+      const { data: blogPosts, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('published_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setPosts(blogPosts || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setPosts([]);
@@ -39,7 +47,23 @@ export const useBlogPosts = () => {
 
   const createPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
     try {
-      const newPost = createBlogPost(postData);
+      const { data: newPost, error } = await supabase
+        .from('blog_posts')
+        .insert([{
+          title: postData.title,
+          content: postData.content,
+          excerpt: postData.excerpt,
+          author: postData.author,
+          published_at: postData.published_at,
+          image_url: postData.image_url
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
       await fetchPosts();
       return { data: newPost, error: null };
     } catch (err) {
@@ -49,7 +73,20 @@ export const useBlogPosts = () => {
 
   const updatePost = async (id: string, postData: Partial<BlogPost>) => {
     try {
-      const updatedPost = updateBlogPost(id, postData);
+      const { data: updatedPost, error } = await supabase
+        .from('blog_posts')
+        .update({
+          ...postData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
       await fetchPosts();
       return { data: updatedPost, error: null };
     } catch (err) {
@@ -59,7 +96,15 @@ export const useBlogPosts = () => {
 
   const deletePost = async (id: string) => {
     try {
-      deleteBlogPost(id);
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
       await fetchPosts();
       return { error: null };
     } catch (err) {
@@ -69,12 +114,40 @@ export const useBlogPosts = () => {
 
   const likePost = async (postId: string) => {
     try {
-      const likedPosts = getLikedPosts();
-      if (likedPosts.includes(postId)) {
+      // Get user's IP address (simplified - in production you'd want a more robust solution)
+      const userIP = 'anonymous-' + Math.random().toString(36).substr(2, 9);
+      
+      // Check if user already liked this post
+      const { data: existingLike } = await supabase
+        .from('likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_ip', userIP)
+        .single();
+
+      if (existingLike) {
         return { error: 'You have already liked this post' };
       }
 
-      likeBlogPost(postId);
+      // Add like
+      const { error: likeError } = await supabase
+        .from('likes')
+        .insert([{ post_id: postId, user_ip: userIP }]);
+
+      if (likeError) {
+        throw likeError;
+      }
+
+      // Update likes count
+      const { error: updateError } = await supabase
+        .from('blog_posts')
+        .update({ likes_count: supabase.sql`likes_count + 1` })
+        .eq('id', postId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
       await fetchPosts();
       return { error: null };
     } catch (err) {

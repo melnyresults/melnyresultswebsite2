@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 import AdminComments from './AdminComments';
 
@@ -12,6 +13,12 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
+  const [stats, setStats] = useState({
+    totalPosts: 0,
+    thisMonthPosts: 0,
+    totalSubmissions: 0,
+    totalSignups: 0
+  });
   
   // Security check - ensure user is authenticated
   useEffect(() => {
@@ -19,6 +26,40 @@ const AdminDashboard: React.FC = () => {
       navigate('/admin/login');
     }
   }, [user, loading, navigate]);
+  
+  // Fetch admin statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+      
+      try {
+        // Get marketing submissions count
+        const { count: submissionsCount } = await supabase
+          .from('marketing_submissions')
+          .select('*', { count: 'exact', head: true });
+        
+        // Get newsletter signups count
+        const { count: signupsCount } = await supabase
+          .from('newsletter_signups')
+          .select('*', { count: 'exact', head: true });
+        
+        setStats({
+          totalPosts: posts.length,
+          thisMonthPosts: posts.filter(post => {
+            const postDate = new Date(post.published_at);
+            const now = new Date();
+            return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
+          }).length,
+          totalSubmissions: submissionsCount || 0,
+          totalSignups: signupsCount || 0
+        });
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+    
+    fetchStats();
+  }, [user, posts]);
   
   usePageMeta({
     title: 'Blog Dashboard - Melny Results Admin',
@@ -123,7 +164,7 @@ const AdminDashboard: React.FC = () => {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Posts</p>
-                <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalPosts}</p>
               </div>
             </div>
           </div>
@@ -136,11 +177,7 @@ const AdminDashboard: React.FC = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Published This Month</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {posts.filter(post => {
-                    const postDate = new Date(post.published_at);
-                    const now = new Date();
-                    return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
-                  }).length}
+                  {stats.thisMonthPosts}
                 </p>
               </div>
             </div>
@@ -149,12 +186,26 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center">
               <div className="p-2 bg-purple-100 rounded-lg">
-                <User className="w-6 h-6 text-purple-600" />
+                <MessageCircle className="w-6 h-6 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Latest Post</p>
-                <p className="text-sm font-bold text-gray-900">
-                  {posts.length > 0 ? formatDate(posts[0].published_at) : 'No posts yet'}
+                <p className="text-sm font-medium text-gray-600">Total Submissions</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.totalSubmissions}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <User className="w-6 h-6 text-orange-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Newsletter Signups</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.totalSignups}
                 </p>
               </div>
             </div>
