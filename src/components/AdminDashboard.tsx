@@ -13,6 +13,13 @@ const AdminDashboard: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
   
+  // Security check - ensure user is authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/admin/login');
+    }
+  }, [user, loading, navigate]);
+  
   usePageMeta({
     title: 'Blog Dashboard - Melny Results Admin',
     description: 'Manage your blog posts, view analytics, and create new content for Melny Results.',
@@ -22,16 +29,22 @@ const AdminDashboard: React.FC = () => {
   });
 
   const handleSignOut = async () => {
+    // Clear any sensitive data before signing out
+    localStorage.removeItem('blog_draft');
+    localStorage.removeItem('liked_posts');
+    
+    // Sign out
     await signOut();
     navigate('/');
   };
 
   const handleDeletePost = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this post?')) {
+    if (window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
       setDeletingId(id);
       const { error } = await deletePost(id);
       if (error) {
-        alert('Error deleting post: ' + error);
+        console.error('Delete error:', error);
+        alert('Failed to delete post. Please try again.');
       }
       setDeletingId(null);
     }

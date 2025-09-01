@@ -128,6 +128,18 @@ const PostEditor: React.FC = () => {
     setLoading(true);
     setError(null);
 
+    // Validate required fields
+    if (!formData.title.trim()) {
+      setError('Title is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.content.trim()) {
+      setError('Content is required');
+      setLoading(false);
+      return;
+    }
     const postData = {
       ...formData,
       excerpt: formData.excerpt || generateExcerpt(formData.content),
@@ -148,10 +160,12 @@ const PostEditor: React.FC = () => {
         postId = newPost.id;
     }
 
+      // Clear draft data after successful save
       localStorage.removeItem('blog_draft');
       await refetch(); // Refresh the posts list
       navigate(`/admin/posts/published/${postId}`);
     } catch (err) {
+      console.error('Post save error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
 

@@ -33,28 +33,51 @@ export interface NewsletterSignup {
 
 // Generate unique IDs
 const generateId = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  // More secure ID generation
+  return Date.now().toString(36) + Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+};
+
+// Input sanitization helper
+const sanitizeInput = (input: string): string => {
+  return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 };
 
 // Blog Posts
 export const getBlogPosts = (): BlogPost[] => {
   const posts = localStorage.getItem('blog_posts');
-  return posts ? JSON.parse(posts) : [];
+  try {
+    return posts ? JSON.parse(posts) : [];
+  } catch (error) {
+    console.error('Error parsing blog posts:', error);
+    return [];
+  }
 };
 
 export const saveBlogPosts = (posts: BlogPost[]) => {
-  localStorage.setItem('blog_posts', JSON.stringify(posts));
+  try {
+    localStorage.setItem('blog_posts', JSON.stringify(posts));
+  } catch (error) {
+    console.error('Error saving blog posts:', error);
+  }
 };
 
 export const createBlogPost = (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>): BlogPost => {
   const posts = getBlogPosts();
+  
+  // Sanitize input data
   const newPost: BlogPost = {
-    ...postData,
+    title: sanitizeInput(postData.title),
+    content: postData.content, // Content is handled by rich text editor
+    excerpt: sanitizeInput(postData.excerpt),
+    author: sanitizeInput(postData.author),
+    published_at: postData.published_at,
+    image_url: postData.image_url,
     id: generateId(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     likes_count: 0,
   };
+  
   posts.unshift(newPost);
   saveBlogPosts(posts);
   return newPost;
@@ -65,9 +88,15 @@ export const updateBlogPost = (id: string, postData: Partial<BlogPost>): BlogPos
   const index = posts.findIndex(post => post.id === id);
   if (index === -1) return null;
   
+  // Sanitize updated data
+  const sanitizedData = { ...postData };
+  if (sanitizedData.title) sanitizedData.title = sanitizeInput(sanitizedData.title);
+  if (sanitizedData.excerpt) sanitizedData.excerpt = sanitizeInput(sanitizedData.excerpt);
+  if (sanitizedData.author) sanitizedData.author = sanitizeInput(sanitizedData.author);
+  
   posts[index] = {
     ...posts[index],
-    ...postData,
+    ...sanitizedData,
     updated_at: new Date().toISOString(),
   };
   saveBlogPosts(posts);
@@ -84,6 +113,11 @@ export const deleteBlogPost = (id: string): boolean => {
 };
 
 export const likeBlogPost = (postId: string): { success: boolean; error?: string } => {
+  // Validate postId
+  if (!postId || typeof postId !== 'string') {
+    return { success: false, error: 'Invalid post ID' };
+  }
+  
   const likedPosts = getLikedPosts();
   if (likedPosts.includes(postId)) {
     return { success: false, error: 'You have already liked this post' };
@@ -97,77 +131,143 @@ export const likeBlogPost = (postId: string): { success: boolean; error?: string
   saveBlogPosts(posts);
   
   likedPosts.push(postId);
-  localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+  try {
+    localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+  } catch (error) {
+    console.error('Error saving liked posts:', error);
+  }
   
   return { success: true };
 };
 
 export const getLikedPosts = (): string[] => {
   const liked = localStorage.getItem('liked_posts');
-  return liked ? JSON.parse(liked) : [];
+  try {
+    return liked ? JSON.parse(liked) : [];
+  } catch (error) {
+    console.error('Error parsing liked posts:', error);
+    return [];
+  }
 };
 
 // Marketing Analysis Submissions
 export const getMarketingSubmissions = (): MarketingSubmission[] => {
+  // This should only be accessible by authenticated admin users
+  const user = getCurrentUser();
+  if (!user) {
+    console.warn('Unauthorized access attempt to marketing submissions');
+    return [];
+  }
+  
   const submissions = localStorage.getItem('marketing_submissions');
-  return submissions ? JSON.parse(submissions) : [];
+  try {
+    return submissions ? JSON.parse(submissions) : [];
+  } catch (error) {
+    console.error('Error parsing marketing submissions:', error);
+    return [];
+  }
 };
 
 export const saveMarketingSubmission = (submissionData: Omit<MarketingSubmission, 'id' | 'created_at'>): MarketingSubmission => {
-  const submissions = getMarketingSubmissions();
+  // Sanitize submission data
   const newSubmission: MarketingSubmission = {
-    ...submissionData,
+    first_name: sanitizeInput(submissionData.first_name),
+    last_name: sanitizeInput(submissionData.last_name),
+    email: sanitizeInput(submissionData.email.toLowerCase()),
+    phone: sanitizeInput(submissionData.phone),
+    company_name: sanitizeInput(submissionData.company_name),
+    how_did_you_find_us: sanitizeInput(submissionData.how_did_you_find_us),
+    monthly_spend: sanitizeInput(submissionData.monthly_spend),
+    website: sanitizeInput(submissionData.website),
     id: generateId(),
     created_at: new Date().toISOString(),
   };
+  
+  const submissions = getMarketingSubmissions();
   submissions.unshift(newSubmission);
-  localStorage.setItem('marketing_submissions', JSON.stringify(submissions));
+  
+  try {
+    localStorage.setItem('marketing_submissions', JSON.stringify(submissions));
+  } catch (error) {
+    console.error('Error saving marketing submission:', error);
+  }
+  
   return newSubmission;
 };
 
 // Newsletter Signups
 export const getNewsletterSignups = (): NewsletterSignup[] => {
+  // This should only be accessible by authenticated admin users
+  const user = getCurrentUser();
+  if (!user) {
+    console.warn('Unauthorized access attempt to newsletter signups');
+    return [];
+  }
+  
   const signups = localStorage.getItem('newsletter_signups');
-  return signups ? JSON.parse(signups) : [];
+  try {
+    return signups ? JSON.parse(signups) : [];
+  } catch (error) {
+    console.error('Error parsing newsletter signups:', error);
+    return [];
+  }
 };
 
 export const saveNewsletterSignup = (email: string): { success: boolean; error?: string } => {
+  // Validate and sanitize email
+  const sanitizedEmail = sanitizeInput(email.toLowerCase().trim());
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+  if (!emailRegex.test(sanitizedEmail)) {
+    return { success: false, error: 'Please enter a valid email address.' };
+  }
+  
   const signups = getNewsletterSignups();
   
   // Check for duplicate email
-  if (signups.some(signup => signup.email === email)) {
+  if (signups.some(signup => signup.email === sanitizedEmail)) {
     return { success: false, error: 'This email is already subscribed to our newsletter.' };
   }
   
   const newSignup: NewsletterSignup = {
     id: generateId(),
-    email,
+    email: sanitizedEmail,
     created_at: new Date().toISOString(),
   };
   
   signups.unshift(newSignup);
-  localStorage.setItem('newsletter_signups', JSON.stringify(signups));
+  
+  try {
+    localStorage.setItem('newsletter_signups', JSON.stringify(signups));
+  } catch (error) {
+    console.error('Error saving newsletter signup:', error);
+    return { success: false, error: 'Failed to save subscription. Please try again.' };
+  }
+  
   return { success: true };
 };
 
-// Simple authentication
+// Authentication functions
 export const authenticateUser = (email: string, password: string): { success: boolean; user?: any; error?: string } => {
-  // Simple hardcoded authentication - replace with your preferred method
-  if (email === 'ivan@melnyresults.com' && password === 'admin123') {
-    const user = { id: 'admin-1', email, authenticated: true };
-    localStorage.setItem('auth_user', JSON.stringify(user));
-    return { success: true, user };
-  }
-  return { success: false, error: 'Invalid email or password' };
+  // This is now handled by Supabase Edge Functions
+  console.warn('authenticateUser called - this should use Supabase Edge Functions');
+  return { success: false, error: 'Authentication handled by secure backend' };
 };
 
 export const getCurrentUser = () => {
-  const user = localStorage.getItem('auth_user');
-  return user ? JSON.parse(user) : null;
+  try {
+    const user = localStorage.getItem('auth_user');
+    return user ? JSON.parse(user) : null;
+  } catch (error) {
+    console.error('Error parsing current user:', error);
+    return null;
+  }
 };
 
 export const signOutUser = () => {
   localStorage.removeItem('auth_user');
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('blog_draft');
 };
 
 // Initialize with some sample data if empty

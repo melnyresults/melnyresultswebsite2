@@ -38,11 +38,32 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await signIn(formData.email, formData.password);
+    // Basic input validation and sanitization
+    const email = formData.email.trim().toLowerCase();
+    const password = formData.password.trim();
+    
+    if (!email || !password) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+    const { data, error } = await signIn(email, password);
 
     if (error) {
       setError(error.message);
+      // Clear form on error for security
+      setFormData(prev => ({ ...prev, password: '' }));
     } else if (data.user) {
+      // Clear form data
+      setFormData({ email: '', password: '' });
       navigate('/admin/dashboard');
     }
 
