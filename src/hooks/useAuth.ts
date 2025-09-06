@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { supabaseUrl } from '../lib/supabase';
 
 // Secure auth API calls
-const AUTH_API_URL = 'https://czgrvkyqsblqhehfjlkw.supabase.co/functions/v1/auth';
+const AUTH_API_URL = `${supabaseUrl}/functions/v1/auth`;
 
 const authAPI = {
   signIn: async (email: string, password: string) => {
