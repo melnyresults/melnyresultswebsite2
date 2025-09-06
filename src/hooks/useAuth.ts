@@ -1,59 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabaseUrl } from '../lib/supabase';
-
-// Secure auth API calls
-const AUTH_API_URL = `${supabaseUrl}/functions/v1/auth`;
-
-const authAPI = {
-  signIn: async (email: string, password: string) => {
-    const response = await fetch(AUTH_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, action: 'signIn' })
-    });
-    
-    if (!response.ok) {
-      throw new Error('Authentication failed');
-    }
-    
-    return response.json();
-  },
-
-  signOut: async () => {
-    const response = await fetch(AUTH_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ action: 'signOut' })
-    });
-    return response.json();
-  },
-
-  getUser: async (token: string) => {
-    const response = await fetch(AUTH_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ action: 'getUser' })
-    });
-    
-    if (!response.ok) {
-      throw new Error('Token validation failed');
-    }
-    
-    return response.json();
-  }
-};
+import { supabase } from '../lib/supabase';
 
 interface User {
   id: string;
   email: string;
-  token?: string;
   role?: string;
 }
 
@@ -62,49 +12,36 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored session with validation
-    const storedUser = localStorage.getItem('auth_user');
-    const storedToken = localStorage.getItem('auth_token');
-    
-    if (storedUser && storedToken) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        
-        // Verify token is still valid
-        authAPI.getUser(storedToken)
-          .then(({ user, error }) => {
-            if (error || !user) {
-              clearAuthData();
-              setUser(null);
-            } else {
-              // Validate user data structure
-              if (user.id && user.email) {
-                setUser({ ...parsedUser, token: storedToken });
-              } else {
-                clearAuthData();
-                setUser(null);
-              }
-            }
-          })
-          .catch(() => {
-            clearAuthData();
-            setUser(null);
-          });
-      } catch (error) {
-        // Invalid stored data
-        clearAuthData();
-        setUser(null);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          role: 'admin'
+        });
       }
-    }
-    setLoading(false);
-  }, []);
+      setLoading(false);
+    });
 
-  const clearAuthData = () => {
-    localStorage.removeItem('auth_user');
-    localStorage.removeItem('auth_token');
-    // Clear any other sensitive data
-    localStorage.removeItem('blog_draft');
-  };
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            role: 'admin'
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -115,24 +52,23 @@ export const useAuth = () => {
         return { data: null, error: { message: 'Email and password are required' } };
       }
 
-      const result = await authAPI.signIn(sanitizedEmail, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: sanitizedEmail,
+        password: password,
+      });
       
-      if (result.error) {
-        return { data: null, error: { message: result.error } };
+      if (error) {
+        return { data: null, error: { message: error.message } };
       }
       
-      if (result.user && result.session) {
+      if (data.user) {
         const userData = {
-          id: result.user.id,
-          email: result.user.email,
-          token: result.session.access_token,
-          role: result.user.role || 'admin'
+          id: data.user.id,
+          email: data.user.email || '',
+          role: 'admin'
         };
         
         setUser(userData);
-        localStorage.setItem('auth_user', JSON.stringify(userData));
-        localStorage.setItem('auth_token', result.session.access_token);
-        
         return { data: { user: userData }, error: null };
       } else {
         return { data: null, error: { message: 'Authentication failed' } };
@@ -145,14 +81,16 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      await authAPI.signOut();
-      clearAuthData();
+      const { error } = await supabase.auth.signOut();
       setUser(null);
-      return { error: null };
+      
+      // Clear any cached data
+      localStorage.removeItem('blog_draft');
+      
+      return { error: error ? { message: error.message } : null };
     } catch (error) {
-      // Even if API call fails, clear local data
-      clearAuthData();
       setUser(null);
+      localStorage.removeItem('blog_draft');
       return { error: null };
     }
   };
