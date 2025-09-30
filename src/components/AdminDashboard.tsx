@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, CreditCard as Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BoltDatabase } from '../lib/boltDatabase';
+import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 import AdminComments from './AdminComments';
 
@@ -33,10 +33,20 @@ const AdminDashboard: React.FC = () => {
       if (!user) return;
       
       try {
-        const dbStats = await BoltDatabase.getStats();
+        // Calculate total posts from the posts array
+        const totalPosts = posts.length;
+        
+        // Calculate posts published this month
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const thisMonthPosts = posts.filter(post => {
+          const postDate = new Date(post.published_at);
+          return postDate.getMonth() === currentMonth && postDate.getFullYear() === currentYear;
+        }).length;
+        
         setStats({
-          totalPosts: dbStats.totalPosts,
-          thisMonthPosts: dbStats.thisMonthPosts,
+          totalPosts,
+          thisMonthPosts,
           totalSubmissions: 0, // Mock data for now
           totalSignups: 0 // Mock data for now
         });
