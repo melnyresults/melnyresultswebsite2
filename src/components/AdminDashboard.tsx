@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, CreditCard as Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BoltDatabase } from '../lib/boltDatabase';
+import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 import AdminComments from './AdminComments';
 
@@ -33,12 +33,25 @@ const AdminDashboard: React.FC = () => {
       if (!user) return;
       
       try {
-        const dbStats = await BoltDatabase.getStats();
+        // Get marketing submissions count
+        const { count: submissionsCount } = await supabase
+          .from('marketing_submissions')
+          .select('*', { count: 'exact', head: true });
+        
+        // Get newsletter signups count
+        const { count: signupsCount } = await supabase
+          .from('newsletter_signups')
+          .select('*', { count: 'exact', head: true });
+        
         setStats({
-          totalPosts: dbStats.totalPosts,
-          thisMonthPosts: dbStats.thisMonthPosts,
-          totalSubmissions: 0, // Mock data for now
-          totalSignups: 0 // Mock data for now
+          totalPosts: posts.length,
+          thisMonthPosts: posts.filter(post => {
+            const postDate = new Date(post.published_at);
+            const now = new Date();
+            return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
+          }).length,
+          totalSubmissions: submissionsCount || 0,
+          totalSignups: signupsCount || 0
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
