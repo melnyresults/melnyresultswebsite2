@@ -1,18 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-
-export type BlogPost = {
-  id: string;
-  title: string;
-  content: string;
-  excerpt: string;
-  author: string;
-  published_at: string;
-  created_at: string;
-  updated_at: string;
-  image_url?: string;
-  likes_count: number;
-};
+import { BoltDatabase, BlogPost } from '../lib/boltDatabase';
 
 export const useBlogPosts = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -22,17 +9,10 @@ export const useBlogPosts = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
+      setError(null);
       
-      const { data: blogPosts, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('published_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      setPosts(blogPosts || []);
+      const blogPosts = await BoltDatabase.getBlogPosts();
+      setPosts(blogPosts);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setPosts([]);
@@ -47,24 +27,8 @@ export const useBlogPosts = () => {
 
   const createPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
     try {
-      const { data: newPost, error } = await supabase
-        .from('blog_posts')
-        .insert([{
-          title: postData.title,
-          content: postData.content,
-          excerpt: postData.excerpt,
-          author: postData.author,
-          published_at: postData.published_at,
-          image_url: postData.image_url
-        }])
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      await fetchPosts();
+      const newPost = await BoltDatabase.createBlogPost(postData);
+      await fetchPosts(); // Refresh the list
       return { data: newPost, error: null };
     } catch (err) {
       return { data: null, error: err instanceof Error ? err.message : 'An error occurred' };
@@ -73,21 +37,11 @@ export const useBlogPosts = () => {
 
   const updatePost = async (id: string, postData: Partial<BlogPost>) => {
     try {
-      const { data: updatedPost, error } = await supabase
-        .from('blog_posts')
-        .update({
-          ...postData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
+      const updatedPost = await BoltDatabase.updateBlogPost(id, postData);
+      if (!updatedPost) {
+        return { data: null, error: 'Post not found' };
       }
-
-      await fetchPosts();
+      await fetchPosts(); // Refresh the list
       return { data: updatedPost, error: null };
     } catch (err) {
       return { data: null, error: err instanceof Error ? err.message : 'An error occurred' };
@@ -96,16 +50,11 @@ export const useBlogPosts = () => {
 
   const deletePost = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        throw error;
+      const success = await BoltDatabase.deleteBlogPost(id);
+      if (!success) {
+        return { error: 'Post not found' };
       }
-
-      await fetchPosts();
+      await fetchPosts(); // Refresh the list
       return { error: null };
     } catch (err) {
       return { error: err instanceof Error ? err.message : 'An error occurred' };
@@ -114,44 +63,13 @@ export const useBlogPosts = () => {
 
   const likePost = async (postId: string) => {
     try {
-      // Get user's IP address (simplified - in production you'd want a more robust solution)
-      const userIP = 'anonymous-' + Math.random().toString(36).substr(2, 9);
-      
-      // Check if user already liked this post
-      const { data: existingLike } = await supabase
-        .from('likes')
-        .select('id')
-        .eq('post_id', postId)
-        .eq('user_ip', userIP)
-        .single();
-
-      if (existingLike) {
-        return { error: 'You have already liked this post' };
+      const result = await BoltDatabase.likeBlogPost(postId);
+      if (result.success) {
+        await fetchPosts(); // Refresh to show updated like count
       }
-
-      // Add like
-      const { error: likeError } = await supabase
-        .from('likes')
-        .insert([{ post_id: postId, user_ip: userIP }]);
-
-      if (likeError) {
-        throw likeError;
-      }
-
-      // Update likes count
-      const { error: updateError } = await supabase
-        .from('blog_posts')
-        .update({ likes_count: supabase.sql`likes_count + 1` })
-        .eq('id', postId);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      await fetchPosts();
-      return { error: null };
+      return result;
     } catch (err) {
-      return { error: err instanceof Error ? err.message : 'An error occurred' };
+      return { success: false, error: err instanceof Error ? err.message : 'An error occurred' };
     }
   };
 
@@ -166,3 +84,5 @@ export const useBlogPosts = () => {
     refetch: fetchPosts,
   };
 };
+
+export type { BlogPost };

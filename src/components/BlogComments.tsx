@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Send, User, Calendar, Heart } from 'lucide-react';
-import { likeBlogPost, getLikedPosts } from '../lib/localStorage';
+import { BoltDatabase } from '../lib/boltDatabase';
 
 interface Comment {
   id: number;
@@ -27,23 +27,22 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postSlug, initialLikes = 0 
   });
 
   useEffect(() => {
-    checkIfLiked();
+    setHasLiked(BoltDatabase.hasLikedPost(postSlug));
     setLoading(false);
   }, [postSlug]);
-
-  const checkIfLiked = () => {
-    const likedPosts = getLikedPosts();
-    setHasLiked(likedPosts.includes(postSlug));
-  };
 
   const handleLike = async () => {
     if (hasLiked || liking) return;
 
     setLiking(true);
     try {
-      likeBlogPost(postSlug);
-      setLikes(prev => prev + 1);
-      setHasLiked(true);
+      const result = await BoltDatabase.likeBlogPost(postSlug);
+      if (result.success) {
+        setLikes(prev => prev + 1);
+        setHasLiked(true);
+      } else {
+        console.error('Error liking post:', result.error);
+      }
     } catch (error) {
       console.error('Error liking post:', error);
     } finally {
