@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Eye, Calendar, User, Image, Tag, Clock, FileText, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
+import { BlogPost, createBlogPost, updateBlogPost } from '../lib/localStorage';
 import RichTextEditor from './RichTextEditor';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -11,7 +12,7 @@ const PostEditor: React.FC = () => {
   const isEditing = Boolean(id);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { posts, refetch, createPost, updatePost } = useBlogPosts();
+  const { posts, refetch } = useBlogPosts();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -29,9 +30,6 @@ const PostEditor: React.FC = () => {
     slug: '',
     canonical_url: '',
     keywords: '',
-    is_published: false,
-    scheduled_publish_date: '',
-    noindex: false,
   });
   
   const [loading, setLoading] = useState(false);
@@ -66,9 +64,6 @@ const PostEditor: React.FC = () => {
           canonical_url: post.canonical_url || '',
           keywords: post.keywords || '',
           tags: post.tags || '',
-          is_published: (post as any).is_published || false,
-          scheduled_publish_date: (post as any).scheduled_publish_date ? new Date((post as any).scheduled_publish_date).toISOString().slice(0, 16) : '',
-          noindex: (post as any).noindex || false,
         }));
       }
     }
@@ -159,32 +154,26 @@ const PostEditor: React.FC = () => {
       ...formData,
       excerpt: formData.excerpt || generateExcerpt(formData.content),
       published_at: new Date(formData.published_at).toISOString(),
-      scheduled_publish_date: formData.scheduled_publish_date ? new Date(formData.scheduled_publish_date).toISOString() : null,
     };
 
     try {
       let postId = id;
       if (isEditing && id) {
-        const result = await updatePost(id, postData);
-        if (result.error) {
-          setError(result.error);
+        const updatedPost = updateBlogPost(id, postData);
+        if (!updatedPost) {
+          setError('Post not found');
           setLoading(false);
           return;
         }
-        postId = id;
       } else {
-        const result = await createPost(postData as any);
-        if (result.error) {
-          setError(result.error);
-          setLoading(false);
-          return;
-        }
-        postId = result.data?.id;
+        const newPost = createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
+        postId = newPost.id;
       }
 
+      // Clear draft data after successful save
       localStorage.removeItem('blog_draft');
-      await refetch();
-      navigate(`/admin/dashboard`);
+      await refetch(); // Refresh the posts list
+      navigate(`/admin/posts/published/${postId}`);
     } catch (err) {
       console.error('Post save error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -381,40 +370,6 @@ const PostEditor: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="is_published"
-                      checked={formData.is_published}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Publish immediately</span>
-                  </label>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Uncheck to save as draft or schedule for later
-                  </p>
-                </div>
-
-                <div>
-                  <label htmlFor="scheduled_publish_date" className="block text-sm font-medium text-gray-700 mb-2">
-                    Schedule Publication
-                  </label>
-                  <input
-                    type="datetime-local"
-                    id="scheduled_publish_date"
-                    name="scheduled_publish_date"
-                    value={formData.scheduled_publish_date}
-                    onChange={handleInputChange}
-                    disabled={!formData.is_published}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    {formData.is_published ? 'Post will be visible after this date/time' : 'Enable "Publish immediately" first'}
-                  </p>
-                </div>
-
-                <div>
                   <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
                     URL Slug
                   </label>
@@ -591,22 +546,6 @@ const PostEditor: React.FC = () => {
                   />
                   <p className="mt-1 text-xs text-gray-500">
                     Tags for categorization and filtering
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-gray-200">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="noindex"
-                      checked={formData.noindex}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Exclude from search engines (noindex)</span>
-                  </label>
-                  <p className="mt-1 text-xs text-gray-500">
-                    This post will not appear in sitemap.xml and search engines will be told not to index it
                   </p>
                 </div>
               </div>
