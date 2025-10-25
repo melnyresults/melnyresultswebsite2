@@ -56,13 +56,13 @@ const BlogPostPage: React.FC = () => {
 
   // Update meta tags when post is loaded
   usePageMeta({
-    title: post ? `${post.title} - Melny Results Blog` : 'Post Not Found - Melny Results',
-    description: post ? (post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
-    keywords: post ? 'marketing strategy, business growth, lead generation, digital marketing' : 'blog, marketing',
-    ogTitle: post ? post.title : 'Post Not Found',
-    ogDescription: post ? (post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
+    title: post ? (post.meta_title || `${post.title} - Melny Results Blog`) : 'Post Not Found - Melny Results',
+    description: post ? (post.meta_description || post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
+    keywords: post ? (post.keywords || 'marketing strategy, business growth, lead generation, digital marketing') : 'blog, marketing',
+    ogTitle: post ? (post.meta_title || post.title) : 'Post Not Found',
+    ogDescription: post ? (post.meta_description || post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
     ogImage: post?.image_url,
-    canonicalUrl: canonicalUrl,
+    canonicalUrl: post?.canonical_url || canonicalUrl,
   });
 
   // Scroll spy for table of contents

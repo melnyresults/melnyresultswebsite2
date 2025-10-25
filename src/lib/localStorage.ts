@@ -10,6 +10,12 @@ export interface BlogPost {
   updated_at: string;
   image_url?: string;
   likes_count: number;
+  meta_title?: string;
+  meta_description?: string;
+  slug?: string;
+  canonical_url?: string;
+  keywords?: string;
+  tags?: string;
 }
 
 export interface MarketingSubmission {

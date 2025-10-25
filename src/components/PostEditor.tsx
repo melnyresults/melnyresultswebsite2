@@ -54,12 +54,12 @@ const PostEditor: React.FC = () => {
           author: post.author,
           image_url: post.image_url || '',
           published_at: post.published_at.split('T')[0],
-          category: 'Growth Strategies',
-          tags: '',
-          meta_description: '',
-          seo_title: '',
-          scheduled_for: '',
-          comments_enabled: true,
+          meta_title: post.meta_title || '',
+          meta_description: post.meta_description || '',
+          slug: post.slug || '',
+          canonical_url: post.canonical_url || '',
+          keywords: post.keywords || '',
+          tags: post.tags || '',
         });
       }
     }
@@ -100,13 +100,19 @@ const PostEditor: React.FC = () => {
 
   const generateSEOSuggestions = () => {
     if (formData.title) {
-      const seoTitle = formData.title.length > 60 ? formData.title.substring(0, 57) + '...' : formData.title;
+      const metaTitle = formData.title.length > 60 ? formData.title.substring(0, 57) + '...' : formData.title;
       const metaDescription = formData.excerpt || generateExcerpt(formData.content);
+      const slug = formData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
       
       setFormData(prev => ({
         ...prev,
-        seo_title: seoTitle,
-        meta_description: metaDescription.length > 160 ? metaDescription.substring(0, 157) + '...' : metaDescription
+        meta_title: metaTitle,
+        meta_description: metaDescription.length > 160 ? metaDescription.substring(0, 157) + '...' : metaDescription,
+        slug: slug,
+        canonical_url: `https://melnyresults.com/blog/${slug}`
       }));
     }
   };
@@ -332,25 +338,6 @@ const PostEditor: React.FC = () => {
               
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
                   <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-2">
                     Author
                   </label>
@@ -379,32 +366,21 @@ const PostEditor: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
-                    Tags (comma separated)
+                  <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                    URL Slug
                   </label>
                   <input
                     type="text"
-                    id="tags"
-                    name="tags"
-                    value={formData.tags}
+                    id="slug"
+                    name="slug"
+                    value={formData.slug}
                     onChange={handleInputChange}
-                    placeholder="marketing, growth, tips"
+                    placeholder="my-blog-post-title"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                   />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="comments_enabled"
-                    name="comments_enabled"
-                    checked={formData.comments_enabled}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
-                  />
-                  <label htmlFor="comments_enabled" className="ml-2 text-sm text-gray-700">
-                    Enable comments
-                  </label>
+                  <p className="mt-1 text-xs text-gray-500">
+                    URL: /blog/{formData.slug || 'your-post-slug'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -483,20 +459,20 @@ const PostEditor: React.FC = () => {
               
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="seo_title" className="block text-sm font-medium text-gray-700 mb-2">
-                    SEO Title
+                  <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 mb-2">
+                    Meta Title
                   </label>
                   <input
                     type="text"
-                    id="seo_title"
-                    name="seo_title"
-                    value={formData.seo_title}
+                    id="meta_title"
+                    name="meta_title"
+                    value={formData.meta_title}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
-                    placeholder="SEO optimized title"
+                    placeholder="SEO optimized title (leave empty to use post title)"
                   />
                   <div className="mt-1 text-sm text-gray-500">
-                    {formData.seo_title.length}/60 characters
+                    {formData.meta_title.length}/60 characters
                   </div>
                 </div>
 
@@ -516,6 +492,57 @@ const PostEditor: React.FC = () => {
                   <div className="mt-1 text-sm text-gray-500">
                     {formData.meta_description.length}/160 characters
                   </div>
+                </div>
+
+                <div>
+                  <label htmlFor="canonical_url" className="block text-sm font-medium text-gray-700 mb-2">
+                    Canonical URL
+                  </label>
+                  <input
+                    type="url"
+                    id="canonical_url"
+                    name="canonical_url"
+                    value={formData.canonical_url}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    placeholder="https://melnyresults.com/blog/your-post-slug"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Leave empty to auto-generate from slug
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="keywords" className="block text-sm font-medium text-gray-700 mb-2">
+                    Keywords (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    id="keywords"
+                    name="keywords"
+                    value={formData.keywords}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    placeholder="marketing, business growth, lead generation"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
+                    Tags (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
+                    placeholder="tips, strategies, case-study"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Tags for categorization and filtering
+                  </p>
                 </div>
               </div>
             </div>
