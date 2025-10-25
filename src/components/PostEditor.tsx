@@ -64,7 +64,7 @@ const PostEditor: React.FC = () => {
           canonical_url: post.canonical_url || '',
           keywords: post.keywords || '',
           tags: post.tags || '',
-        });
+        }));
       }
     }
   }, [isEditing, id, posts]);
@@ -158,17 +158,17 @@ const PostEditor: React.FC = () => {
 
     try {
       let postId = id;
-    if (isEditing && id) {
+      if (isEditing && id) {
         const updatedPost = updateBlogPost(id, postData);
         if (!updatedPost) {
           setError('Post not found');
           setLoading(false);
           return;
         }
-    } else {
+      } else {
         const newPost = createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
         postId = newPost.id;
-    }
+      }
 
       // Clear draft data after successful save
       localStorage.removeItem('blog_draft');
