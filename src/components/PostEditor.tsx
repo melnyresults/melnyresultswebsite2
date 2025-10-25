@@ -24,9 +24,12 @@ const PostEditor: React.FC = () => {
     category: 'Growth Strategies',
     tags: '',
     meta_description: '',
-    seo_title: '',
+    meta_title: '',
     scheduled_for: '',
     comments_enabled: true,
+    slug: '',
+    canonical_url: '',
+    keywords: '',
   });
   
   const [loading, setLoading] = useState(false);
@@ -47,13 +50,14 @@ const PostEditor: React.FC = () => {
     if (isEditing && id) {
       const post = posts.find(p => p.id === id);
       if (post) {
-        setFormData({
-          title: post.title,
-          content: post.content,
-          excerpt: post.excerpt,
-          author: post.author,
+        setFormData(prev => ({
+          ...prev,
+          title: post.title || '',
+          content: post.content || '',
+          excerpt: post.excerpt || '',
+          author: post.author || 'Ivan Melnychenko',
           image_url: post.image_url || '',
-          published_at: post.published_at.split('T')[0],
+          published_at: post.published_at ? post.published_at.split('T')[0] : new Date().toISOString().split('T')[0],
           meta_title: post.meta_title || '',
           meta_description: post.meta_description || '',
           slug: post.slug || '',
@@ -269,7 +273,7 @@ const PostEditor: React.FC = () => {
                   aria-describedby="title-help"
                 />
                 <div id="title-help" className="mt-2 text-sm text-gray-500">
-                  {formData.title.length}/60 characters (optimal for SEO)
+                  {(formData.title || '').length}/60 characters (optimal for SEO)
                 </div>
               </div>
 
@@ -379,7 +383,7 @@ const PostEditor: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    URL: /blog/{formData.slug || 'your-post-slug'}
+                    URL: /blog/{(formData.slug || 'your-post-slug')}
                   </p>
                 </div>
               </div>
@@ -439,7 +443,7 @@ const PostEditor: React.FC = () => {
                 placeholder="Brief description of your post (will be auto-generated if left empty)"
               />
               <div className="mt-2 text-sm text-gray-500">
-                {formData.excerpt.length}/150 characters
+                {(formData.excerpt || '').length}/150 characters
               </div>
             </div>
 
@@ -472,7 +476,7 @@ const PostEditor: React.FC = () => {
                     placeholder="SEO optimized title (leave empty to use post title)"
                   />
                   <div className="mt-1 text-sm text-gray-500">
-                    {formData.meta_title.length}/60 characters
+                    {(formData.meta_title || '').length}/60 characters
                   </div>
                 </div>
 
@@ -490,7 +494,7 @@ const PostEditor: React.FC = () => {
                     placeholder="Meta description for search engines"
                   />
                   <div className="mt-1 text-sm text-gray-500">
-                    {formData.meta_description.length}/160 characters
+                    {(formData.meta_description || '').length}/160 characters
                   </div>
                 </div>
 
