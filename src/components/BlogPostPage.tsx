@@ -65,6 +65,7 @@ const BlogPostPage: React.FC = () => {
     ogDescription: post ? (post.meta_description || post.excerpt || generateExcerpt(post.content)) : 'The blog post you\'re looking for doesn\'t exist.',
     ogImage: post?.image_url,
     canonicalUrl: post?.canonical_url || canonicalUrl,
+    noindex: post?.noindex || false,
   });
 
   // Scroll spy for table of contents

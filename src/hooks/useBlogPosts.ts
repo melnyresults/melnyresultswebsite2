@@ -18,6 +18,9 @@ export type BlogPost = {
   canonical_url?: string;
   keywords?: string;
   tags?: string;
+  is_published?: boolean;
+  scheduled_publish_date?: string;
+  noindex?: boolean;
 };
 
 export const useBlogPosts = () => {
@@ -25,14 +28,24 @@ export const useBlogPosts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (includeScheduled = false) => {
     try {
       setLoading(true);
-      
-      const { data: blogPosts, error } = await supabase
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      let query = supabase
         .from('blog_posts')
         .select('*')
         .order('published_at', { ascending: false });
+
+      if (!user && !includeScheduled) {
+        query = query
+          .eq('is_published', true)
+          .or(`scheduled_publish_date.is.null,scheduled_publish_date.lte.${new Date().toISOString()}`);
+      }
+
+      const { data: blogPosts, error } = await query;
 
       if (error) {
         throw error;
@@ -61,7 +74,16 @@ export const useBlogPosts = () => {
           excerpt: postData.excerpt,
           author: postData.author,
           published_at: postData.published_at,
-          image_url: postData.image_url
+          image_url: postData.image_url,
+          meta_title: postData.meta_title,
+          meta_description: postData.meta_description,
+          slug: postData.slug,
+          canonical_url: postData.canonical_url,
+          keywords: postData.keywords,
+          tags: postData.tags,
+          is_published: postData.is_published || false,
+          scheduled_publish_date: postData.scheduled_publish_date || null,
+          noindex: postData.noindex || false,
         }])
         .select()
         .single();

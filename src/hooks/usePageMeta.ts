@@ -8,6 +8,7 @@ interface PageMetaData {
   ogDescription?: string;
   ogImage?: string;
   canonicalUrl?: string;
+  noindex?: boolean;
 }
 
 export const usePageMeta = (meta: PageMetaData) => {
@@ -61,6 +62,17 @@ export const usePageMeta = (meta: PageMetaData) => {
         document.head.appendChild(canonical);
       }
       canonical.setAttribute('href', meta.canonicalUrl);
+    }
+
+    // Update robots meta tag for noindex
+    if (meta.noindex !== undefined) {
+      let robotsMeta = document.querySelector('meta[name="robots"]');
+      if (!robotsMeta) {
+        robotsMeta = document.createElement('meta');
+        robotsMeta.setAttribute('name', 'robots');
+        document.head.appendChild(robotsMeta);
+      }
+      robotsMeta.setAttribute('content', meta.noindex ? 'noindex, nofollow' : 'index, follow');
     }
 
     // Update Twitter title

@@ -10,6 +10,7 @@ interface SEOHeadProps {
   ogImage?: string;
   canonicalUrl?: string;
   structuredData?: object;
+  noindex?: boolean;
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
@@ -20,16 +21,18 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   ogDescription,
   ogImage,
   canonicalUrl,
-  structuredData
+  structuredData,
+  noindex = false
 }) => {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const canonical = canonicalUrl || currentUrl;
-  
+
   return (
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
       
       {/* Canonical URL */}
       <link rel="canonical" href={canonical} />
