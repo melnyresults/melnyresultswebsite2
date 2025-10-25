@@ -5,8 +5,7 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import TextStyle from '@tiptap/extension-text-style';
 import FontFamily from '@tiptap/extension-font-family';
-import Image from '@tiptap/extension-image';
-import { FontSize } from '../lib/tiptap-extensions';
+import { FontSize, ImageExtension } from '../lib/tiptap-extensions';
 import {
   Bold,
   Italic,
@@ -73,7 +72,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           class: 'text-primary-blue underline hover:text-blue-700',
         },
       }),
-      Image.configure({
+      ImageExtension.configure({
         inline: true,
         allowBase64: true,
         HTMLAttributes: {
