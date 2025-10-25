@@ -17,6 +17,7 @@ import ThankYouConsultPage from './components/ThankYouConsultPage';
 import NewsletterPage from './components/NewsletterPage';
 import NewsletterThankYouPage from './components/NewsletterThankYouPage';
 import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
 import AdminDashboard from './components/AdminDashboard';
 import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -112,6 +113,7 @@ function App() {
         <Route path="/newsletter" element={<NewsletterPage />} />
         <Route path="/newsletter/thank-you" element={<NewsletterThankYouPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
+        <Route path="/admin/signup" element={<SignupPage />} />
         <Route path="/generative-engine-optimization-guide" element={<GenerativeEngineOptimizationPage />} />
         <Route path="/generative-engine-optimization-guide-thanks" element={<GenerativeEngineOptimizationThanksPage />} />
         <Route path="/generative-engine-optimization-guide-nthanks" element={<GenerativeEngineOptimizationNThanksPage />} />
