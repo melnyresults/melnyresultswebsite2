@@ -69,7 +69,7 @@ export const saveBlogPosts = (posts: BlogPost[]) => {
 
 export const createBlogPost = (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>): BlogPost => {
   const posts = getBlogPosts();
-  
+
   // Sanitize input data
   const newPost: BlogPost = {
     title: sanitizeInput(postData.title),
@@ -78,12 +78,18 @@ export const createBlogPost = (postData: Omit<BlogPost, 'id' | 'created_at' | 'u
     author: sanitizeInput(postData.author),
     published_at: postData.published_at,
     image_url: postData.image_url,
+    meta_title: postData.meta_title,
+    meta_description: postData.meta_description,
+    slug: postData.slug,
+    canonical_url: postData.canonical_url,
+    keywords: postData.keywords,
+    tags: postData.tags,
     id: generateId(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     likes_count: 0,
   };
-  
+
   posts.unshift(newPost);
   saveBlogPosts(posts);
   return newPost;
