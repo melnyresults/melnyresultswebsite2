@@ -4,6 +4,7 @@ import { Menu, X as CloseIcon, ArrowLeft, Calendar, User, Clock, Heart, Share2, 
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { BlogPost } from '../lib/localStorage';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useBlogEngagement } from '../hooks/useBlogEngagement';
 import BlogComments from './BlogComments';
 
 const BlogPostPage: React.FC = () => {
@@ -19,6 +20,7 @@ const BlogPostPage: React.FC = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { posts, likePost } = useBlogPosts();
+  const { postId, views } = useBlogEngagement(slug || '');
 
   // Production domain configuration
   const PRODUCTION_DOMAIN = 'https://melnyresults.com';
@@ -439,7 +441,7 @@ const BlogPostPage: React.FC = () => {
 
       {/* Comments Section */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <BlogComments postSlug={slug || ''} initialLikes={post.likes_count} />
+        <BlogComments postId={postId || ''} postSlug={slug || ''} />
       </div>
 
       {/* Related Posts */}
