@@ -26,6 +26,7 @@ import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngin
 import GenerativeEngineOptimizationNThanksPage from './components/GenerativeEngineOptimizationNThanksPage';
 import BlogPublishConfirmation from './components/BlogPublishConfirmation';
 import MelnyPage from './components/MelnyPage';
+import TrackingScripts from './components/TrackingScripts';
 import { usePageMeta } from './hooks/usePageMeta';
 
 // Component to handle scroll to top on route change
@@ -100,6 +101,7 @@ function HomePage() {
 function App() {
   return (
     <Router>
+      <TrackingScripts />
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />

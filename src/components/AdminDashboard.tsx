@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, CreditCard as Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../hooks/usePageMeta';
 import AdminComments from './AdminComments';
+import AdminSettings from './AdminSettings';
 
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const { posts, loading, deletePost } = useBlogPosts();
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'comments' | 'settings'>('posts');
   const [stats, setStats] = useState({
     totalPosts: 0,
     thisMonthPosts: 0,
@@ -234,6 +235,17 @@ const AdminDashboard: React.FC = () => {
               <MessageCircle className="w-4 h-4" />
               Comments
             </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                activeTab === 'settings'
+                  ? 'bg-white text-primary-blue shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              Settings
+            </button>
           </div>
         </div>
 
@@ -328,8 +340,10 @@ const AdminDashboard: React.FC = () => {
               )}
             </div>
           </div>
+        ) : activeTab === 'comments' ? (
+          <AdminComments />
         ) : (
-          <AdminComments token={user?.token || ''} />
+          <AdminSettings />
         )}
       </main>
     </div>

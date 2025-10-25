@@ -17,6 +17,7 @@
     "@tiptap/extension-document": "^2.1.13",
     "@tiptap/extension-font-family": "^2.22.3",
     "@tiptap/extension-heading": "^2.1.13",
+    "@tiptap/extension-image": "^2.22.3",
     "@tiptap/extension-italic": "^2.1.13",
     "@tiptap/extension-link": "^2.1.13",
     "@tiptap/extension-list-item": "^2.1.13",

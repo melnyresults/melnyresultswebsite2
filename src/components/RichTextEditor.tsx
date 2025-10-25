@@ -5,6 +5,7 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import TextStyle from '@tiptap/extension-text-style';
 import FontFamily from '@tiptap/extension-font-family';
+import Image from '@tiptap/extension-image';
 import { FontSize } from '../lib/tiptap-extensions';
 import {
   Bold,
@@ -23,7 +24,8 @@ import {
   Type,
   Plus,
   Minus,
-  ChevronDown
+  ChevronDown,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -71,6 +73,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           class: 'text-primary-blue underline hover:text-blue-700',
         },
       }),
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+        HTMLAttributes: {
+          class: 'rounded-lg max-w-full h-auto my-4',
+        },
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -95,6 +104,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const url = window.prompt('Enter URL:');
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
+    }
+  };
+
+  const addImage = () => {
+    const url = window.prompt('Enter image URL:');
+    if (url) {
+      const alt = window.prompt('Enter alt text (for accessibility):') || 'Image';
+      editor.chain().focus().setImage({ src: url, alt: alt }).run();
     }
   };
 
@@ -333,7 +350,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             </ToolbarButton>
           </div>
 
-          {/* Link */}
+          {/* Link & Image */}
           <div className="flex gap-1 mr-4">
             <ToolbarButton
               onClick={addLink}
@@ -341,6 +358,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               title="Add Link"
             >
               <LinkIcon className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={addImage}
+              isActive={editor.isActive('image')}
+              title="Add Image"
+            >
+              <ImageIcon className="w-4 h-4" />
             </ToolbarButton>
           </div>
 
