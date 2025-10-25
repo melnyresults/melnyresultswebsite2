@@ -21,6 +21,9 @@ export type BlogPost = {
   is_published?: boolean;
   scheduled_publish_date?: string;
   noindex?: boolean;
+  schema_type?: 'blog' | 'custom';
+  custom_schema?: object;
+  related_post_ids?: string[];
 };
 
 export const useBlogPosts = () => {
@@ -84,6 +87,9 @@ export const useBlogPosts = () => {
           is_published: postData.is_published || false,
           scheduled_publish_date: postData.scheduled_publish_date || null,
           noindex: postData.noindex || false,
+          schema_type: postData.schema_type || 'blog',
+          custom_schema: postData.custom_schema || null,
+          related_post_ids: postData.related_post_ids || [],
         }])
         .select()
         .single();

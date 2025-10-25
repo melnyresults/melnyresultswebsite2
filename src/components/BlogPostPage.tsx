@@ -68,6 +68,53 @@ const BlogPostPage: React.FC = () => {
     noindex: post?.noindex || false,
   });
 
+  // Add structured data (schema) to head
+  useEffect(() => {
+    if (!post) return;
+
+    let schemaData;
+    if (post.schema_type === 'custom' && post.custom_schema) {
+      schemaData = post.custom_schema;
+    } else {
+      schemaData = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post.title,
+        "image": post.image_url || "",
+        "author": {
+          "@type": "Person",
+          "name": post.author
+        },
+        "datePublished": post.published_at,
+        "dateModified": post.updated_at,
+        "description": post.excerpt || generateExcerpt(post.content),
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": canonicalUrl
+        }
+      };
+    }
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(schemaData);
+    script.id = 'blog-schema';
+
+    const existingScript = document.getElementById('blog-schema');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptToRemove = document.getElementById('blog-schema');
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [post, canonicalUrl]);
+
   // Scroll spy for table of contents
   useEffect(() => {
     const handleScroll = () => {
@@ -210,7 +257,9 @@ const BlogPostPage: React.FC = () => {
     );
   }
 
-  const relatedPosts = posts.filter(p => p.id !== post.id).slice(0, 3);
+  const relatedPosts = post.related_post_ids && post.related_post_ids.length > 0
+    ? posts.filter(p => post.related_post_ids?.includes(p.id)).slice(0, 3)
+    : posts.filter(p => p.id !== post.id).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white">

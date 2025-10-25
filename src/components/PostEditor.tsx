@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Eye, Calendar, User, Image, Tag, Clock, FileText, Zap } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Calendar, User, Image, Tag, Clock, FileText, Zap, X } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BlogPost, createBlogPost, updateBlogPost } from '../lib/localStorage';
 import RichTextEditor from './RichTextEditor';
 import { usePageMeta } from '../hooks/usePageMeta';
+import RelatedPostsSelector from './RelatedPostsSelector';
 
 const PostEditor: React.FC = () => {
   const { id } = useParams();
   const isEditing = Boolean(id);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { posts, refetch } = useBlogPosts();
+  const { posts, refetch, createPost, updatePost } = useBlogPosts();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -30,11 +30,19 @@ const PostEditor: React.FC = () => {
     slug: '',
     canonical_url: '',
     keywords: '',
+    is_published: false,
+    scheduled_publish_date: '',
+    noindex: false,
+    schema_type: 'blog' as 'blog' | 'custom',
+    custom_schema: '',
+    related_post_ids: [] as string[],
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  const [relatedPostSearch, setRelatedPostSearch] = useState('');
+  const [showRelatedPosts, setShowRelatedPosts] = useState(false);
   
   usePageMeta({
     title: `${isEditing ? 'Edit Post' : 'New Post'} - Melny Results Admin`,
@@ -64,6 +72,12 @@ const PostEditor: React.FC = () => {
           canonical_url: post.canonical_url || '',
           keywords: post.keywords || '',
           tags: post.tags || '',
+          is_published: post.is_published || false,
+          scheduled_publish_date: post.scheduled_publish_date ? new Date(post.scheduled_publish_date).toISOString().slice(0, 16) : '',
+          noindex: post.noindex || false,
+          schema_type: (post.schema_type || 'blog') as 'blog' | 'custom',
+          custom_schema: post.custom_schema ? JSON.stringify(post.custom_schema, null, 2) : '',
+          related_post_ids: post.related_post_ids || [],
         }));
       }
     }
@@ -150,30 +164,48 @@ const PostEditor: React.FC = () => {
       setLoading(false);
       return;
     }
+    let customSchemaObj = null;
+    if (formData.schema_type === 'custom' && formData.custom_schema) {
+      try {
+        customSchemaObj = JSON.parse(formData.custom_schema);
+      } catch (err) {
+        setError('Invalid JSON in custom schema');
+        setLoading(false);
+        return;
+      }
+    }
+
     const postData = {
       ...formData,
       excerpt: formData.excerpt || generateExcerpt(formData.content),
       published_at: new Date(formData.published_at).toISOString(),
+      scheduled_publish_date: formData.scheduled_publish_date ? new Date(formData.scheduled_publish_date).toISOString() : null,
+      custom_schema: customSchemaObj,
     };
 
     try {
       let postId = id;
       if (isEditing && id) {
-        const updatedPost = updateBlogPost(id, postData);
-        if (!updatedPost) {
-          setError('Post not found');
+        const result = await updatePost(id, postData);
+        if (result.error) {
+          setError(result.error);
           setLoading(false);
           return;
         }
+        postId = id;
       } else {
-        const newPost = createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
-        postId = newPost.id;
+        const result = await createPost(postData as any);
+        if (result.error) {
+          setError(result.error);
+          setLoading(false);
+          return;
+        }
+        postId = result.data?.id;
       }
 
-      // Clear draft data after successful save
       localStorage.removeItem('blog_draft');
-      await refetch(); // Refresh the posts list
-      navigate(`/admin/posts/published/${postId}`);
+      await refetch();
+      navigate(`/admin/dashboard`);
     } catch (err) {
       console.error('Post save error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -370,6 +402,40 @@ const PostEditor: React.FC = () => {
                 </div>
 
                 <div>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="is_published"
+                      checked={formData.is_published}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Publish immediately</span>
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Uncheck to save as draft or schedule for later
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="scheduled_publish_date" className="block text-sm font-medium text-gray-700 mb-2">
+                    Schedule Publication
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="scheduled_publish_date"
+                    name="scheduled_publish_date"
+                    value={formData.scheduled_publish_date}
+                    onChange={handleInputChange}
+                    disabled={!formData.is_published}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    {formData.is_published ? 'Post will be visible after this date/time' : 'Enable "Publish immediately" first'}
+                  </p>
+                </div>
+
+                <div>
                   <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
                     URL Slug
                   </label>
@@ -546,6 +612,112 @@ const PostEditor: React.FC = () => {
                   />
                   <p className="mt-1 text-xs text-gray-500">
                     Tags for categorization and filtering
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-gray-200">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="noindex"
+                      checked={formData.noindex}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Exclude from search engines (noindex)</span>
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500">
+                    This post will not appear in sitemap.xml and search engines will be told not to index it
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Schema Settings */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Structured Data (Schema)</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Schema Type
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="schema_type"
+                        value="blog"
+                        checked={formData.schema_type === 'blog'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-primary-blue border-gray-300 focus:ring-primary-blue"
+                      />
+                      <span className="text-sm text-gray-700">Automatic Blog Schema</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="schema_type"
+                        value="custom"
+                        checked={formData.schema_type === 'custom'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-primary-blue border-gray-300 focus:ring-primary-blue"
+                      />
+                      <span className="text-sm text-gray-700">Custom JSON-LD Schema</span>
+                    </label>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500">
+                    Automatic schema generates BlogPosting schema. Use custom for other types.
+                  </p>
+                </div>
+
+                {formData.schema_type === 'custom' && (
+                  <div>
+                    <label htmlFor="custom_schema" className="block text-sm font-medium text-gray-700 mb-2">
+                      Custom Schema JSON
+                    </label>
+                    <textarea
+                      id="custom_schema"
+                      name="custom_schema"
+                      rows={10}
+                      value={formData.custom_schema}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent font-mono text-sm resize-none"
+                      placeholder={'{\n  "@context": "https://schema.org",\n  "@type": "Article",\n  ...\n}'}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enter valid JSON-LD schema markup
+                    </p>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-xs text-blue-800">
+                    <strong>Tip:</strong> Automatic blog schema includes title, author, datePublished, dateModified, image, and description. Use custom schema for specialized content types like recipes, events, or products.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Related Posts */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Internal Linking</h3>
+
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600">
+                  Select related posts to show at the bottom of this article for internal linking and better SEO.
+                </p>
+
+                <RelatedPostsSelector
+                  posts={posts}
+                  selectedIds={formData.related_post_ids}
+                  onChange={(ids) => setFormData(prev => ({ ...prev, related_post_ids: ids }))}
+                  currentPostId={id}
+                />
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-xs text-green-800">
+                    <strong>SEO Benefit:</strong> Internal linking helps search engines understand your content structure and distributes page authority across your site.
                   </p>
                 </div>
               </div>
