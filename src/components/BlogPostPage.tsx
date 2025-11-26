@@ -27,15 +27,12 @@ const BlogPostPage: React.FC = () => {
 
   useEffect(() => {
     if (posts.length > 0 && slug) {
-      const slugParts = slug.split('-');
-      const postId = slugParts[slugParts.length - 1];
-      
-      const foundPost = posts.find(p => p.id.startsWith(postId));
-      
+      const foundPost = posts.find(p => p.slug === slug);
+
       if (foundPost) {
         setPost(foundPost);
         setNotFound(false);
-        
+
         // Generate table of contents
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = foundPost.content;
@@ -215,12 +212,16 @@ const BlogPostPage: React.FC = () => {
     }
   };
 
-  const createSlug = (title: string, id: string) => {
-    const slug = title
+  const getPostSlug = (post: any) => {
+    if (post.slug) {
+      return post.slug;
+    }
+    // Fallback to generating from title + ID if slug doesn't exist
+    const slug = post.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-    return `${slug}-${id.slice(0, 8)}`;
+    return `${slug}-${post.id.slice(0, 8)}`;
   };
 
   const getRandomCategory = () => {
@@ -507,7 +508,7 @@ const BlogPostPage: React.FC = () => {
               {relatedPosts.map((relatedPost) => (
                 <Link
                   key={relatedPost.id}
-                  to={`/blog/${createSlug(relatedPost.title, relatedPost.id)}`}
+                  to={`/blog/${getPostSlug(relatedPost)}`}
                   className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden group"
                 >
                   <img 

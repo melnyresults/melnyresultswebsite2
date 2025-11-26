@@ -40,12 +40,16 @@ const BlogPage: React.FC = () => {
     return `${readTime} min read`;
   };
 
-  const createSlug = (title: string, id: string) => {
-    const slug = title
+  const getPostSlug = (post: any) => {
+    if (post.slug) {
+      return post.slug;
+    }
+    // Fallback to generating from title + ID if slug doesn't exist
+    const slug = post.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-    return `${slug}-${id.slice(0, 8)}`;
+    return `${slug}-${post.id.slice(0, 8)}`;
   };
 
   const getRandomCategory = () => {
@@ -205,7 +209,7 @@ const BlogPage: React.FC = () => {
 
                         {/* Read More Button */}
                         <Link
-                          to={`/blog/${createSlug(post.title, post.id)}`}
+                          to={`/blog/${getPostSlug(post)}`}
                           className="inline-flex items-center gap-2 bg-primary-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium group"
                         >
                           Read More
@@ -273,7 +277,7 @@ const BlogPage: React.FC = () => {
                     {posts.slice(0, 3).map((post) => (
                       <Link
                         key={post.id}
-                        to={`/blog/${createSlug(post.title, post.id)}`}
+                        to={`/blog/${getPostSlug(post)}`}
                         className="block group"
                       >
                         <div className="flex gap-3">
