@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { generateFingerprint } from '../lib/fingerprint';
 
 export type BlogPost = {
   id: string;
@@ -148,16 +149,15 @@ export const useBlogPosts = () => {
 
   const likePost = async (postId: string) => {
     try {
-      // Get user's IP address (simplified - in production you'd want a more robust solution)
-      const userIP = 'anonymous-' + Math.random().toString(36).substr(2, 9);
-      
+      const fingerprint = generateFingerprint();
+
       // Check if user already liked this post
       const { data: existingLike } = await supabase
-        .from('likes')
+        .from('blog_likes')
         .select('id')
         .eq('post_id', postId)
-        .eq('user_ip', userIP)
-        .single();
+        .eq('user_fingerprint', fingerprint)
+        .maybeSingle();
 
       if (existingLike) {
         return { error: 'You have already liked this post' };
@@ -165,23 +165,21 @@ export const useBlogPosts = () => {
 
       // Add like
       const { error: likeError } = await supabase
-        .from('likes')
-        .insert([{ post_id: postId, user_ip: userIP }]);
+        .from('blog_likes')
+        .insert([{ post_id: postId, user_fingerprint: fingerprint }]);
 
       if (likeError) {
         throw likeError;
       }
 
-      // Update likes count
-      const { error: updateError } = await supabase
+      // Fetch updated post to get new likes count
+      const { data: updatedPost } = await supabase
         .from('blog_posts')
-        .update({ likes_count: supabase.sql`likes_count + 1` })
-        .eq('id', postId);
+        .select('likes_count')
+        .eq('id', postId)
+        .single();
 
-      if (updateError) {
-        throw updateError;
-      }
-
+      // Refresh posts list
       await fetchPosts();
       return { error: null };
     } catch (err) {
