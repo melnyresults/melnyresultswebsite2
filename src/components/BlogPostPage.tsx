@@ -213,15 +213,15 @@ const BlogPostPage: React.FC = () => {
   };
 
   const getPostSlug = (post: any) => {
-    if (post.slug) {
+    if (post.slug && post.slug.trim()) {
       return post.slug;
     }
-    // Fallback to generating from title + ID if slug doesn't exist
+    // Fallback to generating from title only (no ID) if slug doesn't exist
     const slug = post.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-    return `${slug}-${post.id.slice(0, 8)}`;
+    return slug;
   };
 
   const getRandomCategory = () => {
