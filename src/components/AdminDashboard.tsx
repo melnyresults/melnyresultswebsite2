@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, CreditCard as Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart, Settings } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, LogOut, Eye, Calendar, User, MessageCircle, Heart, Settings, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 import { supabase } from '../lib/supabase';
@@ -10,9 +10,10 @@ import AdminSettings from './AdminSettings';
 
 const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
-  const { posts, loading, deletePost } = useBlogPosts();
+  const { posts, loading, deletePost, updatePost } = useBlogPosts();
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'posts' | 'comments' | 'settings'>('posts');
   const [stats, setStats] = useState({
     totalPosts: 0,
@@ -86,6 +87,26 @@ const AdminDashboard: React.FC = () => {
         alert('Failed to delete post. Please try again.');
       }
       setDeletingId(null);
+    }
+  };
+
+  const handleTogglePublish = async (post: any) => {
+    const newStatus = !post.is_published;
+    const action = newStatus ? 'publish' : 'unpublish';
+
+    if (window.confirm(`Are you sure you want to ${action} this post?`)) {
+      setPublishingId(post.id);
+      const { error } = await updatePost(post.id, {
+        ...post,
+        is_published: newStatus,
+        published_at: newStatus && !post.published_at ? new Date().toISOString() : post.published_at
+      });
+
+      if (error) {
+        console.error('Publish toggle error:', error);
+        alert(`Failed to ${action} post. Please try again.`);
+      }
+      setPublishingId(null);
     }
   };
 
@@ -290,10 +311,13 @@ const AdminDashboard: React.FC = () => {
                           Title
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Author
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Published
+                          Date
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
@@ -309,6 +333,15 @@ const AdminDashboard: React.FC = () => {
                               <div className="text-sm text-gray-500 truncate max-w-xs">{post.excerpt}</div>
                             </div>
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              post.is_published
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {post.is_published ? 'Published' : 'Draft'}
+                            </span>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {post.author}
                           </td>
@@ -317,6 +350,22 @@ const AdminDashboard: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleTogglePublish(post)}
+                                disabled={publishingId === post.id}
+                                className={`p-1 rounded transition-colors disabled:opacity-50 ${
+                                  post.is_published
+                                    ? 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'
+                                    : 'text-green-600 hover:text-green-700 hover:bg-green-50'
+                                }`}
+                                title={post.is_published ? 'Unpublish' : 'Publish'}
+                              >
+                                {post.is_published ? (
+                                  <XCircle className="w-4 h-4" />
+                                ) : (
+                                  <CheckCircle className="w-4 h-4" />
+                                )}
+                              </button>
                               <Link
                                 to={`/admin/posts/edit/${post.id}`}
                                 className="text-primary-blue hover:text-blue-700 p-1 rounded hover:bg-blue-50 transition-colors"
