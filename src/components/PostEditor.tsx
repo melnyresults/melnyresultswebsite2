@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Eye, Calendar, User, Image, Tag, Clock, FileText, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { useBlogPosts } from '../hooks/useBlogPosts';
-import { BlogPost, createBlogPost, updateBlogPost } from '../lib/localStorage';
+import { useBlogPosts, BlogPost } from '../hooks/useBlogPosts';
 import RichTextEditor from './RichTextEditor';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -12,7 +11,7 @@ const PostEditor: React.FC = () => {
   const isEditing = Boolean(id);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { posts, refetch } = useBlogPosts();
+  const { posts, createPost, updatePost } = useBlogPosts();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -158,21 +157,27 @@ const PostEditor: React.FC = () => {
 
     try {
       let postId = id;
+
       if (isEditing && id) {
-        const updatedPost = updateBlogPost(id, postData);
-        if (!updatedPost) {
-          setError('Post not found');
+        const result = await updatePost(id, postData);
+        if (result.error) {
+          setError(result.error);
           setLoading(false);
           return;
         }
+        postId = id;
       } else {
-        const newPost = createBlogPost(postData as Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>);
-        postId = newPost.id;
+        const result = await createPost(postData);
+        if (result.error) {
+          setError(result.error);
+          setLoading(false);
+          return;
+        }
+        postId = result.data?.id || '';
       }
 
       // Clear draft data after successful save
       localStorage.removeItem('blog_draft');
-      await refetch(); // Refresh the posts list
       navigate(`/admin/posts/published/${postId}`);
     } catch (err) {
       console.error('Post save error:', err);
