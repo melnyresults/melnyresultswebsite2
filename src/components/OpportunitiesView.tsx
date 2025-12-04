@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, DollarSign, Phone, Mail, MapPin, Tag, User, FileText } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, DollarSign, Phone, Mail, MapPin, Tag, User, FileText, GripVertical, AlertCircle } from 'lucide-react';
 import { usePipelines } from '../hooks/usePipelines';
 import { useOpportunities } from '../hooks/useOpportunities';
 import CreatePipelineModal from './CreatePipelineModal';
@@ -10,7 +10,7 @@ import EditOpportunityModal from './EditOpportunityModal';
 const OpportunitiesView: React.FC = () => {
   const { pipelines, stages, loading: pipelinesLoading, refetchStages, deletePipeline } = usePipelines();
   const [selectedPipeline, setSelectedPipeline] = useState<string>('');
-  const { opportunities, loading: oppsLoading } = useOpportunities(selectedPipeline);
+  const { opportunities, loading: oppsLoading, updateOpportunity, deleteOpportunity } = useOpportunities(selectedPipeline);
   const [showCreatePipeline, setShowCreatePipeline] = useState(false);
   const [showEditPipeline, setShowEditPipeline] = useState(false);
   const [showCreateOpportunity, setShowCreateOpportunity] = useState(false);
@@ -18,6 +18,13 @@ const OpportunitiesView: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<any>(null);
   const [opportunityToEdit, setOpportunityToEdit] = useState<any>(null);
+  const [opportunityToDelete, setOpportunityToDelete] = useState<any>(null);
+  const [showDeleteOpportunityConfirm, setShowDeleteOpportunityConfirm] = useState(false);
+  const [draggedOpportunity, setDraggedOpportunity] = useState<any>(null);
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
+  const dragImageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (pipelines.length > 0 && !selectedPipeline) {
@@ -54,6 +61,118 @@ const OpportunitiesView: React.FC = () => {
         setSelectedPipeline('');
       }
     }
+  };
+
+  const handleDeleteOpportunity = async () => {
+    if (!opportunityToDelete) return;
+
+    const { error } = await deleteOpportunity(opportunityToDelete.id);
+    if (!error) {
+      setShowDeleteOpportunityConfirm(false);
+      setOpportunityToDelete(null);
+    } else {
+      alert('Failed to delete opportunity. Please try again.');
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, opportunity: any) => {
+    setDraggedOpportunity(opportunity);
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.currentTarget.innerHTML);
+
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.4';
+    }
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    setIsDragging(false);
+    setDraggedOpportunity(null);
+    setDragOverStage(null);
+
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '1';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, stageId: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverStage(stageId);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverStage(null);
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetStageId: string) => {
+    e.preventDefault();
+    setDragOverStage(null);
+
+    if (!draggedOpportunity || draggedOpportunity.stage_id === targetStageId) {
+      return;
+    }
+
+    const { error } = await updateOpportunity(draggedOpportunity.id, {
+      stage_id: targetStageId,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      alert('Failed to move opportunity. Please try again.');
+    }
+
+    setDraggedOpportunity(null);
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, opportunity: any) => {
+    const touch = e.touches[0];
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setDraggedOpportunity(opportunity);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartPos || !draggedOpportunity) return;
+
+    e.preventDefault();
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+
+    if (deltaX > 10 || deltaY > 10) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleTouchEnd = async (e: React.TouchEvent, targetStageId: string) => {
+    if (!draggedOpportunity || !isDragging) {
+      setTouchStartPos(null);
+      setDraggedOpportunity(null);
+      setIsDragging(false);
+      return;
+    }
+
+    if (draggedOpportunity.stage_id === targetStageId) {
+      setTouchStartPos(null);
+      setDraggedOpportunity(null);
+      setIsDragging(false);
+      return;
+    }
+
+    const { error } = await updateOpportunity(draggedOpportunity.id, {
+      stage_id: targetStageId,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      alert('Failed to move opportunity. Please try again.');
+    }
+
+    setTouchStartPos(null);
+    setDraggedOpportunity(null);
+    setIsDragging(false);
   };
 
   const currentPipeline = pipelines.find(p => p.id === selectedPipeline);
@@ -96,15 +215,15 @@ const OpportunitiesView: React.FC = () => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gray-900">Opportunities</h1>
+      <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Opportunities</h1>
             <div className="flex items-center space-x-2">
               <select
                 value={selectedPipeline}
                 onChange={(e) => setSelectedPipeline(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                className="px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue text-sm md:text-base"
               >
                 {pipelines.map(pipeline => (
                   <option key={pipeline.id} value={pipeline.id}>{pipeline.name}</option>
@@ -117,41 +236,43 @@ const OpportunitiesView: React.FC = () => {
                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     title="Edit pipeline"
                   >
-                    <Edit2 className="w-5 h-5" />
+                    <Edit2 className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Delete pipeline"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                 </>
               )}
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 md:space-x-3">
             <button
               onClick={() => setShowCreateOpportunity(true)}
-              className="inline-flex items-center px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 md:px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              New Opportunity
+              <Plus className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">New Opportunity</span>
+              <span className="sm:hidden">Opportunity</span>
             </button>
             <button
               onClick={() => setShowCreatePipeline(true)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 md:px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm md:text-base"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              New Pipeline
+              <Plus className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">New Pipeline</span>
+              <span className="sm:hidden">Pipeline</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Pipeline Board */}
-      <div className="flex-1 overflow-x-auto p-8 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="flex space-x-6 h-full min-h-[600px]">
+      <div className="flex-1 overflow-x-auto p-4 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="flex space-x-4 md:space-x-6 h-full min-h-[600px]">
           {pipelineStages.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center bg-white p-8 rounded-xl shadow-sm">
@@ -162,21 +283,34 @@ const OpportunitiesView: React.FC = () => {
             pipelineStages.map((stage) => {
               const stageOpportunities = getOpportunitiesByStage(stage.id);
               const stageValue = calculateStageValue(stage.id);
+              const isDropTarget = dragOverStage === stage.id;
 
               return (
-                <div key={stage.id} className="flex-shrink-0 w-80">
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 h-full flex flex-col">
-                    {/* Stage Header with Color Bar */}
+                <div
+                  key={stage.id}
+                  className="flex-shrink-0 w-72 md:w-80"
+                  onDragOver={(e) => handleDragOver(e, stage.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, stage.id)}
+                  onTouchEnd={(e) => handleTouchEnd(e, stage.id)}
+                >
+                  <div
+                    className={`bg-white rounded-xl shadow-sm border-2 p-4 h-full flex flex-col transition-all ${
+                      isDropTarget
+                        ? 'border-primary-blue bg-blue-50 scale-105 shadow-lg'
+                        : 'border-gray-200'
+                    }`}
+                  >
                     <div className="mb-4">
                       <div
                         className="h-1 w-full rounded-full mb-3 shadow-sm"
                         style={{ backgroundColor: stage.color }}
                       />
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-bold text-gray-900 text-lg">{stage.name}</h3>
+                        <h3 className="font-bold text-gray-900 text-base md:text-lg">{stage.name}</h3>
                         <div className="flex items-center space-x-2">
                           <span
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white shadow-sm"
+                            className="w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold text-white shadow-sm"
                             style={{ backgroundColor: stage.color }}
                           >
                             {stageOpportunities.length}
@@ -185,58 +319,102 @@ const OpportunitiesView: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-2">
                         <DollarSign className="w-4 h-4 text-gray-500" />
-                        <span className="text-lg font-bold text-gray-900">
+                        <span className="text-base md:text-lg font-bold text-gray-900">
                           ${stageValue.toLocaleString()}
                         </span>
                       </div>
                     </div>
 
-                    {/* Opportunities */}
                     <div className="flex-1 space-y-3 overflow-y-auto pr-1">
                       {stageOpportunities.length === 0 ? (
                         <div className="text-center py-8 text-gray-400 text-sm">
-                          No opportunities in this stage
+                          {isDropTarget ? 'Drop here' : 'No opportunities in this stage'}
                         </div>
                       ) : (
                         stageOpportunities.map((opp) => (
                           <div
                             key={opp.id}
-                            onClick={() => setSelectedOpportunity(opp)}
-                            className="bg-white p-4 rounded-lg border-2 border-gray-100 hover:border-primary-blue cursor-pointer transition-all hover:shadow-md group"
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, opp)}
+                            onDragEnd={handleDragEnd}
+                            onTouchStart={(e) => handleTouchStart(e, opp)}
+                            onTouchMove={handleTouchMove}
+                            className={`bg-white p-3 md:p-4 rounded-lg border-2 hover:border-primary-blue cursor-move transition-all hover:shadow-md group relative ${
+                              draggedOpportunity?.id === opp.id
+                                ? 'opacity-50 scale-95'
+                                : 'border-gray-100'
+                            }`}
                             style={{
                               borderLeftWidth: '4px',
                               borderLeftColor: stage.color,
+                              touchAction: 'none',
                             }}
                           >
-                            <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-gray-900 text-sm group-hover:text-primary-blue transition-colors">
-                                {opp.lead_name}
-                              </h4>
-                              <span className="text-sm font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
-                                ${Number(opp.value).toLocaleString()}
-                              </span>
-                            </div>
-                            {opp.business_name && (
-                              <p className="text-xs text-gray-600 mb-3 font-medium">{opp.business_name}</p>
-                            )}
-                            <div className="flex flex-wrap items-center gap-2 text-xs">
-                              {opp.city && (
-                                <span className="flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
-                                  <MapPin className="w-3 h-3 mr-1" />
-                                  {opp.city}
-                                </span>
-                              )}
-                              {opp.source && (
-                                <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-md font-medium">
-                                  {opp.source}
-                                </span>
-                              )}
-                              {opp.tags && opp.tags.length > 0 && (
-                                <span className="flex items-center px-2 py-1 bg-gray-100 text-gray-700 rounded-md">
-                                  <Tag className="w-3 h-3 mr-1" />
-                                  {opp.tags[0]}
-                                </span>
-                              )}
+                            <div className="flex items-start space-x-2">
+                              <div className="flex-shrink-0 mt-1 text-gray-400 cursor-grab active:cursor-grabbing">
+                                <GripVertical className="w-4 h-4" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between mb-2">
+                                  <h4
+                                    className="font-semibold text-gray-900 text-sm group-hover:text-primary-blue transition-colors flex-1 cursor-pointer"
+                                    onClick={() => setSelectedOpportunity(opp)}
+                                  >
+                                    {opp.lead_name}
+                                  </h4>
+                                  <div className="flex items-center space-x-1 ml-2">
+                                    <span className="text-sm font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
+                                      ${Number(opp.value).toLocaleString()}
+                                    </span>
+                                  </div>
+                                </div>
+                                {opp.business_name && (
+                                  <p className="text-xs text-gray-600 mb-2 font-medium">{opp.business_name}</p>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
+                                  {opp.city && (
+                                    <span className="flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
+                                      <MapPin className="w-3 h-3 mr-1" />
+                                      {opp.city}
+                                    </span>
+                                  )}
+                                  {opp.source && (
+                                    <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-md font-medium">
+                                      {opp.source}
+                                    </span>
+                                  )}
+                                  {opp.tags && opp.tags.length > 0 && (
+                                    <span className="flex items-center px-2 py-1 bg-gray-100 text-gray-700 rounded-md">
+                                      <Tag className="w-3 h-3 mr-1" />
+                                      {opp.tags[0]}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpportunityToEdit(opp);
+                                      setShowEditOpportunity(true);
+                                    }}
+                                    className="p-1.5 text-primary-blue hover:bg-blue-50 rounded transition-colors"
+                                    title="Edit opportunity"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpportunityToDelete(opp);
+                                      setShowDeleteOpportunityConfirm(true);
+                                    }}
+                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                    title="Delete opportunity"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         ))
@@ -262,10 +440,20 @@ const OpportunitiesView: React.FC = () => {
         />
       )}
       {showDeleteConfirm && (
-        <DeleteConfirmModal
+        <DeletePipelineModal
           pipelineName={currentPipeline?.name || ''}
           onConfirm={handleDeletePipeline}
           onClose={() => setShowDeleteConfirm(false)}
+        />
+      )}
+      {showDeleteOpportunityConfirm && opportunityToDelete && (
+        <DeleteOpportunityModal
+          opportunityName={opportunityToDelete.lead_name}
+          onConfirm={handleDeleteOpportunity}
+          onClose={() => {
+            setShowDeleteOpportunityConfirm(false);
+            setOpportunityToDelete(null);
+          }}
         />
       )}
       {showCreateOpportunity && (
@@ -293,36 +481,86 @@ const OpportunitiesView: React.FC = () => {
             setShowEditOpportunity(true);
             setSelectedOpportunity(null);
           }}
+          onDelete={(opp) => {
+            setOpportunityToDelete(opp);
+            setShowDeleteOpportunityConfirm(true);
+            setSelectedOpportunity(null);
+          }}
         />
       )}
     </div>
   );
 };
 
-const DeleteConfirmModal: React.FC<{
+const DeletePipelineModal: React.FC<{
   pipelineName: string;
   onConfirm: () => void;
   onClose: () => void;
 }> = ({ pipelineName, onConfirm, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Pipeline</h3>
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete <span className="font-semibold">{pipelineName}</span>? This action cannot be undone and will delete all associated stages and opportunities.
-        </p>
-        <div className="flex justify-end space-x-3">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+        <div className="flex items-start space-x-3 mb-4">
+          <div className="p-3 bg-red-100 rounded-full">
+            <AlertCircle className="w-6 h-6 text-red-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Pipeline</h3>
+            <p className="text-gray-600">
+              Are you sure you want to delete <span className="font-semibold">{pipelineName}</span>? This action cannot be undone and will delete all associated stages and opportunities.
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
           >
             Delete Pipeline
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DeleteOpportunityModal: React.FC<{
+  opportunityName: string;
+  onConfirm: () => void;
+  onClose: () => void;
+}> = ({ opportunityName, onConfirm, onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+        <div className="flex items-start space-x-3 mb-4">
+          <div className="p-3 bg-red-100 rounded-full">
+            <Trash2 className="w-6 h-6 text-red-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Opportunity</h3>
+            <p className="text-gray-600">
+              Are you sure you want to delete the opportunity for <span className="font-semibold">{opportunityName}</span>? This action cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-md hover:shadow-lg"
+          >
+            Delete Opportunity
           </button>
         </div>
       </div>
@@ -334,10 +572,12 @@ const OpportunityDetailModal: React.FC<{
   opportunity: any;
   onClose: () => void;
   onEdit: (opp: any) => void;
+  onDelete: (opp: any) => void;
 }> = ({
   opportunity,
   onClose,
   onEdit,
+  onDelete,
 }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
@@ -472,20 +712,29 @@ const OpportunityDetailModal: React.FC<{
             )}
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-3">
+          <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
             <button
-              onClick={onClose}
-              className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-semibold hover:shadow-sm"
+              onClick={() => onDelete(opportunity)}
+              className="px-6 py-3 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-all font-semibold hover:shadow-sm flex items-center space-x-2"
             >
-              Close
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
             </button>
-            <button
-              onClick={() => onEdit(opportunity)}
-              className="px-6 py-3 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-md hover:shadow-lg flex items-center space-x-2"
-            >
-              <Edit2 className="w-4 h-4" />
-              <span>Edit Opportunity</span>
-            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={onClose}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-semibold hover:shadow-sm"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => onEdit(opportunity)}
+                className="px-6 py-3 bg-primary-blue text-white rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-md hover:shadow-lg flex items-center space-x-2"
+              >
+                <Edit2 className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
