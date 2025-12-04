@@ -4,13 +4,16 @@ import { usePipelines } from '../hooks/usePipelines';
 import { useOpportunities } from '../hooks/useOpportunities';
 import CreatePipelineModal from './CreatePipelineModal';
 import CreateOpportunityModal from './CreateOpportunityModal';
+import EditPipelineModal from './EditPipelineModal';
 
 const OpportunitiesView: React.FC = () => {
-  const { pipelines, stages, loading: pipelinesLoading, refetchStages } = usePipelines();
+  const { pipelines, stages, loading: pipelinesLoading, refetchStages, deletePipeline } = usePipelines();
   const [selectedPipeline, setSelectedPipeline] = useState<string>('');
   const { opportunities, loading: oppsLoading } = useOpportunities(selectedPipeline);
   const [showCreatePipeline, setShowCreatePipeline] = useState(false);
+  const [showEditPipeline, setShowEditPipeline] = useState(false);
   const [showCreateOpportunity, setShowCreateOpportunity] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<any>(null);
 
   useEffect(() => {
@@ -34,6 +37,23 @@ const OpportunitiesView: React.FC = () => {
   const calculateStageValue = (stageId: string) => {
     return getOpportunitiesByStage(stageId).reduce((sum, opp) => sum + Number(opp.value), 0);
   };
+
+  const handleDeletePipeline = async () => {
+    if (!selectedPipeline) return;
+
+    const { error } = await deletePipeline(selectedPipeline);
+    if (!error) {
+      setShowDeleteConfirm(false);
+      if (pipelines.length > 1) {
+        const remainingPipelines = pipelines.filter(p => p.id !== selectedPipeline);
+        setSelectedPipeline(remainingPipelines[0]?.id || '');
+      } else {
+        setSelectedPipeline('');
+      }
+    }
+  };
+
+  const currentPipeline = pipelines.find(p => p.id === selectedPipeline);
 
   if (pipelinesLoading) {
     return (
@@ -77,15 +97,35 @@ const OpportunitiesView: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-900">Opportunities</h1>
-            <select
-              value={selectedPipeline}
-              onChange={(e) => setSelectedPipeline(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
-            >
-              {pipelines.map(pipeline => (
-                <option key={pipeline.id} value={pipeline.id}>{pipeline.name}</option>
-              ))}
-            </select>
+            <div className="flex items-center space-x-2">
+              <select
+                value={selectedPipeline}
+                onChange={(e) => setSelectedPipeline(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
+              >
+                {pipelines.map(pipeline => (
+                  <option key={pipeline.id} value={pipeline.id}>{pipeline.name}</option>
+                ))}
+              </select>
+              {selectedPipeline && (
+                <>
+                  <button
+                    onClick={() => setShowEditPipeline(true)}
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Edit pipeline"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete pipeline"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
           <div className="flex items-center space-x-3">
             <button
@@ -179,6 +219,20 @@ const OpportunitiesView: React.FC = () => {
       {showCreatePipeline && (
         <CreatePipelineModal onClose={() => setShowCreatePipeline(false)} />
       )}
+      {showEditPipeline && currentPipeline && (
+        <EditPipelineModal
+          pipeline={currentPipeline}
+          pipelineStages={pipelineStages}
+          onClose={() => setShowEditPipeline(false)}
+        />
+      )}
+      {showDeleteConfirm && (
+        <DeleteConfirmModal
+          pipelineName={currentPipeline?.name || ''}
+          onConfirm={handleDeletePipeline}
+          onClose={() => setShowDeleteConfirm(false)}
+        />
+      )}
       {showCreateOpportunity && (
         <CreateOpportunityModal
           pipelineId={selectedPipeline}
@@ -191,6 +245,37 @@ const OpportunitiesView: React.FC = () => {
           onClose={() => setSelectedOpportunity(null)}
         />
       )}
+    </div>
+  );
+};
+
+const DeleteConfirmModal: React.FC<{
+  pipelineName: string;
+  onConfirm: () => void;
+  onClose: () => void;
+}> = ({ pipelineName, onConfirm, onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Pipeline</h3>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete <span className="font-semibold">{pipelineName}</span>? This action cannot be undone and will delete all associated stages and opportunities.
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Delete Pipeline
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
