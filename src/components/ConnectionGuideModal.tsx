@@ -15,7 +15,7 @@ const ConnectionGuideModal: React.FC<ConnectionGuideModalProps> = ({
   onClose,
 }) => {
   const { connectPlatform } = usePlatformIntegrations();
-  const [showGuide, setShowGuide] = useState(!isConnected);
+  const [showGuide, setShowGuide] = useState(true);
   const [credentials, setCredentials] = useState<Record<string, string>>({});
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,16 +74,14 @@ const ConnectionGuideModal: React.FC<ConnectionGuideModalProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          {!isConnected && (
-            <div className="mb-6">
-              <button
-                onClick={() => setShowGuide(!showGuide)}
-                className="flex items-center space-x-2 text-primary-blue hover:text-blue-700 font-medium text-sm"
-              >
-                <span>{showGuide ? 'Hide' : 'Show'} Setup Guide</span>
-              </button>
-            </div>
-          )}
+          <div className="mb-6">
+            <button
+              onClick={() => setShowGuide(!showGuide)}
+              className="flex items-center space-x-2 text-primary-blue hover:text-blue-700 font-medium text-sm"
+            >
+              <span>{showGuide ? 'Hide' : 'Show'} Setup Guide</span>
+            </button>
+          </div>
 
           {showGuide && (
             <div className="mb-8">
