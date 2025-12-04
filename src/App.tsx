@@ -22,6 +22,8 @@ import CRMDashboard from './components/CRMDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
+import GoogleAnalyticsDashboard from './components/GoogleAnalyticsDashboard';
+import PlatformIntegrations from './components/PlatformIntegrations';
 import GenerativeEngineOptimizationPage from './components/GenerativeEngineOptimizationPage';
 import GenerativeEngineOptimizationThanksPage from './components/GenerativeEngineOptimizationThanksPage';
 import GenerativeEngineOptimizationNThanksPage from './components/GenerativeEngineOptimizationNThanksPage';
@@ -145,13 +147,29 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/admin/posts/published/:id" 
+        <Route
+          path="/admin/posts/published/:id"
           element={
             <ProtectedRoute>
               <BlogPublishConfirmation />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/crm/analytics"
+          element={
+            <ProtectedRoute>
+              <GoogleAnalyticsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/crm/integrations"
+          element={
+            <ProtectedRoute>
+              <PlatformIntegrations />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </Router>
