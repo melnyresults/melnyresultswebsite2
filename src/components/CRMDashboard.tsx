@@ -7,6 +7,7 @@ import DashboardMetrics from './DashboardMetrics';
 import OpportunitiesView from './OpportunitiesView';
 import MarketingView from './MarketingView';
 import AdminDashboard from './AdminDashboard';
+import NotificationBell from './NotificationBell';
 
 type SidebarSection = 'dashboard' | 'opportunities' | 'marketing' | 'blog';
 
@@ -39,8 +40,8 @@ const CRMDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-gray-200">
+        {/* Logo & Notifications */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
           <Link to="/">
             <img
               src="/melny-results-logo.png"
@@ -48,6 +49,7 @@ const CRMDashboard: React.FC = () => {
               className="h-8 w-auto"
             />
           </Link>
+          <NotificationBell />
         </div>
 
         {/* Navigation */}
