@@ -18,6 +18,7 @@ import NewsletterPage from './components/NewsletterPage';
 import NewsletterThankYouPage from './components/NewsletterThankYouPage';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
+import CRMDashboard from './components/CRMDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import PostEditor from './components/PostEditor';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -120,13 +121,13 @@ function App() {
         <Route path="/generative-engine-optimization-guide-thanks" element={<GenerativeEngineOptimizationThanksPage />} />
         <Route path="/generative-engine-optimization-guide-nthanks" element={<GenerativeEngineOptimizationNThanksPage />} />
         <Route path="/melny" element={<MelnyPage />} />
-        <Route 
-          path="/admin/dashboard" 
+        <Route
+          path="/admin/dashboard"
           element={
             <ProtectedRoute>
-              <AdminDashboard />
+              <CRMDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route 
           path="/admin/posts/new" 
