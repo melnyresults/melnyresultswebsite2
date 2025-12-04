@@ -343,10 +343,10 @@ const GoogleAnalyticsDashboard: React.FC = () => {
 
               <div className="border-l-4 border-primary-blue pl-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Step 7: Generate Your Access Token
+                  Step 7: Generate Your Refresh Token
                 </h3>
                 <p className="text-gray-700 mb-3">
-                  Use Google OAuth Playground to create an access token with the correct permissions
+                  Use Google OAuth Playground to create a refresh token for permanent access
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600 ml-4">
                   <li className="flex items-start">
@@ -407,11 +407,15 @@ const GoogleAnalyticsDashboard: React.FC = () => {
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span className="font-semibold text-red-600">IMPORTANT: Copy the "Access token" value (NOT the refresh token)</span>
+                    <span>You will see both "Access token" and "Refresh token" in the response</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span>This is the token you will paste into the connection form</span>
+                    <span className="font-semibold text-green-600">IMPORTANT: Copy the "Refresh token" value (this provides permanent access)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>The refresh token is the long string that never expires and allows automatic token renewal</span>
                   </li>
                 </ul>
               </div>
@@ -439,7 +443,11 @@ const GoogleAnalyticsDashboard: React.FC = () => {
                 <ul className="space-y-1 text-sm text-blue-800">
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span>Access tokens expire after 1 hour - you will need to regenerate them by repeating Step 7</span>
+                    <span className="font-semibold text-green-700">Refresh tokens provide permanent access - the system automatically handles token renewal</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>You only need to set this up once - no need to regenerate tokens every hour</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
@@ -451,7 +459,7 @@ const GoogleAnalyticsDashboard: React.FC = () => {
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span>Keep your Client ID, Client Secret, and Access Token secure and never share them publicly</span>
+                    <span>Keep your Client ID, Client Secret, and Refresh Token secure and never share them publicly</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
@@ -792,10 +800,10 @@ const GoogleAnalyticsDashboard: React.FC = () => {
 
               <div className="border-l-4 border-primary-blue pl-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Step 7: Generate Your Access Token
+                  Step 7: Generate Your Refresh Token
                 </h3>
                 <p className="text-gray-700 mb-3">
-                  Use Google OAuth Playground to create an access token with the correct permissions
+                  Use Google OAuth Playground to create a refresh token for permanent access
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600 ml-4">
                   <li className="flex items-start">
@@ -856,11 +864,15 @@ const GoogleAnalyticsDashboard: React.FC = () => {
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span className="font-semibold text-red-600">IMPORTANT: Copy the "Access token" value (NOT the refresh token)</span>
+                    <span>You will see both "Access token" and "Refresh token" in the response</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span>This is the token you will paste into the connection form</span>
+                    <span className="font-semibold text-green-600">IMPORTANT: Copy the "Refresh token" value (this provides permanent access)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>The refresh token is the long string that never expires and allows automatic token renewal</span>
                   </li>
                 </ul>
               </div>
@@ -888,7 +900,11 @@ const GoogleAnalyticsDashboard: React.FC = () => {
                 <ul className="space-y-1 text-sm text-blue-800">
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span>Access tokens expire after 1 hour - you will need to regenerate them by repeating Step 7</span>
+                    <span className="font-semibold text-green-700">Refresh tokens provide permanent access - the system automatically handles token renewal</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>You only need to set this up once - no need to regenerate tokens every hour</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
@@ -900,7 +916,7 @@ const GoogleAnalyticsDashboard: React.FC = () => {
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
-                    <span>Keep your Client ID, Client Secret, and Access Token secure and never share them publicly</span>
+                    <span>Keep your Client ID, Client Secret, and Refresh Token secure and never share them publicly</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-2">•</span>
