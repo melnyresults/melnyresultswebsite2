@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Users, FileText, Mail, MessageSquare, Target, Award } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useOpportunities } from '../hooks/useOpportunities';
+import DateRangeSelector, { DateRange, getDefaultDateRange } from './DateRangeSelector';
 
 const DashboardMetrics: React.FC = () => {
   const { opportunities } = useOpportunities();
+  const [dateRange, setDateRange] = useState<DateRange>(getDefaultDateRange());
   const [metrics, setMetrics] = useState({
     pipelineValue: 0,
     closedRevenue: 0,
@@ -17,35 +19,37 @@ const DashboardMetrics: React.FC = () => {
 
   useEffect(() => {
     fetchMetrics();
-  }, [opportunities]);
+  }, [opportunities, dateRange]);
 
   const fetchMetrics = async () => {
     try {
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-      const firstDayOfMonth = new Date(currentYear, currentMonth, 1).toISOString();
+      const startDate = dateRange.startDate.toISOString();
+      const endDate = dateRange.endDate.toISOString();
 
-      // Calculate pipeline value (sum of all open opportunities)
-      const pipelineValue = opportunities
+      const filteredOpportunities = opportunities.filter(opp => {
+        const createdDate = new Date(opp.created_at);
+        return createdDate >= dateRange.startDate && createdDate <= dateRange.endDate;
+      });
+
+      const pipelineValue = filteredOpportunities
         .filter(opp => opp.status === 'open')
         .reduce((sum, opp) => sum + Number(opp.value), 0);
 
-      // Calculate closed revenue (sum of all won opportunities)
-      const closedRevenue = opportunities
-        .filter(opp => opp.status === 'won')
-        .reduce((sum, opp) => sum + Number(opp.value), 0);
+      const closedOpportunities = opportunities.filter(opp => {
+        if (opp.status !== 'won') return false;
+        const closedDate = opp.closed_at ? new Date(opp.closed_at) : new Date(opp.updated_at);
+        return closedDate >= dateRange.startDate && closedDate <= dateRange.endDate;
+      });
 
-      // Count new leads this month
-      const newLeads = opportunities.filter(opp => {
-        const createdDate = new Date(opp.created_at);
-        return createdDate >= new Date(firstDayOfMonth);
-      }).length;
+      const closedRevenue = closedOpportunities.reduce((sum, opp) => sum + Number(opp.value), 0);
 
-      // Fetch blog posts this month
+      const newLeads = filteredOpportunities.length;
+
       const { data: posts } = await supabase
         .from('blog_posts')
         .select('id')
-        .gte('created_at', firstDayOfMonth);
+        .gte('created_at', startDate)
+        .lte('created_at', endDate);
 
       // Fetch newsletter signups (mock data for now)
       const newsletterSignups = 0;
@@ -131,10 +135,18 @@ const DashboardMetrics: React.FC = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Overview of your business performance and metrics</p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            <p className="text-sm md:text-base text-gray-600">Overview of your business performance and metrics</p>
+          </div>
+          <DateRangeSelector
+            selectedRange={dateRange}
+            onRangeChange={setDateRange}
+          />
+        </div>
       </div>
 
       {/* Metrics Grid */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Save, AlertCircle, CheckCircle, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { saveSitemap } from '../lib/sitemap';
+import PushNotificationSettings from './PushNotificationSettings';
 
 const AdminSettings: React.FC = () => {
   const [ga4MeasurementId, setGa4MeasurementId] = useState('');
@@ -183,6 +184,12 @@ const AdminSettings: React.FC = () => {
               {saving ? 'Saving...' : 'Save Settings'}
             </button>
           </div>
+        </div>
+      )}
+
+      {!loading && (
+        <div className="mt-6">
+          <PushNotificationSettings />
         </div>
       )}
     </div>

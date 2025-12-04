@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Briefcase, TrendingUp, Edit3, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, Briefcase, TrendingUp, Edit3, LogOut, User, Menu, X } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import DashboardMetrics from './DashboardMetrics';
 import OpportunitiesView from './OpportunitiesView';
 import MarketingView from './MarketingView';
@@ -15,6 +16,9 @@ const CRMDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<SidebarSection>('dashboard');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useRealtimeNotifications();
 
   usePageMeta({
     title: 'CRM Dashboard - Melny Results',
@@ -37,11 +41,46 @@ const CRMDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+        <button
+          onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          {isMobileSidebarOpen ? (
+            <X className="w-6 h-6 text-gray-700" />
+          ) : (
+            <Menu className="w-6 h-6 text-gray-700" />
+          )}
+        </button>
+        <Link to="/">
+          <img
+            src="/melny-results-logo.png"
+            alt="Melny Results Logo"
+            className="h-8 w-auto"
+          />
+        </Link>
+        <NotificationBell />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        {/* Logo & Notifications */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
+      <aside className={`
+        fixed md:static inset-y-0 left-0 z-50
+        w-64 bg-white border-r border-gray-200 flex flex-col
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        {/* Logo & Notifications - Desktop Only */}
+        <div className="hidden md:flex h-16 items-center justify-between px-6 border-b border-gray-200">
           <Link to="/">
             <img
               src="/melny-results-logo.png"
@@ -53,7 +92,7 @@ const CRMDashboard: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -61,7 +100,10 @@ const CRMDashboard: React.FC = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => {
+                  setActiveSection(item.id);
+                  setIsMobileSidebarOpen(false);
+                }}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-blue-50 text-primary-blue'
