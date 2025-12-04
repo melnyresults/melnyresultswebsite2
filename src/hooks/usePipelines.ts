@@ -13,7 +13,7 @@ export type PipelineStage = {
   id: string;
   pipeline_id: string;
   name: string;
-  order: number;
+  stage_order: number;
   color: string;
   created_at: string;
   updated_at: string;
@@ -47,7 +47,7 @@ export const usePipelines = () => {
       let query = supabase
         .from('pipeline_stages')
         .select('*')
-        .order('order', { ascending: true });
+        .order('stage_order', { ascending: true });
 
       if (pipelineId) {
         query = query.eq('pipeline_id', pipelineId);
@@ -68,9 +68,15 @@ export const usePipelines = () => {
 
   const createPipeline = async (pipelineData: Omit<Pipeline, 'id' | 'created_at' | 'updated_at'>) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error('You must be logged in to create a pipeline');
+      }
+
       const { data, error } = await supabase
         .from('pipelines')
-        .insert([pipelineData])
+        .insert([{ ...pipelineData, user_id: user.id }])
         .select()
         .single();
 

@@ -61,7 +61,7 @@ const CreatePipelineModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
         const { error: stageError } = await createStage({
           pipeline_id: pipeline.id,
           name: stages[i].name,
-          order: i,
+          stage_order: i,
           color: stages[i].color,
         });
 
