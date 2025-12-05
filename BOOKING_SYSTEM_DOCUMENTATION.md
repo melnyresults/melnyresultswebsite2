@@ -77,7 +77,11 @@ A comprehensive Calendly-like booking system built with React, TypeScript, and S
 
 ### Admin Routes (Protected)
 
-- `/booking/dashboard` - Main booking system dashboard with tabs:
+The booking system is integrated into the main CRM dashboard at `/admin/dashboard`.
+
+**Access:** Click "Bookings" in the left sidebar (appears after Dashboard, Opportunities, Marketing, and Blog Builder).
+
+The Bookings section contains 5 tabs:
   - **Event Types**: Create and manage meeting types
   - **Availability**: Set weekly hours and date overrides
   - **Bookings**: View and manage scheduled meetings
@@ -97,19 +101,24 @@ A comprehensive Calendly-like booking system built with React, TypeScript, and S
 
 ### Setting Up Your Booking System
 
-1. **Create Profile** (One-time setup)
-   - Complete your profile in Settings
+1. **Access the Booking System**
+   - Log in to your admin dashboard at `/admin/dashboard`
+   - Click "Bookings" in the left sidebar (fifth menu item with calendar icon)
+
+2. **Create Profile** (One-time setup)
+   - Go to the Settings tab in Bookings section
+   - Complete your profile
    - Choose a unique username
    - Set your timezone
    - Add bio and welcome message
 
-2. **Create Availability Schedule**
+3. **Create Availability Schedule**
    - Go to Availability tab
    - Create a schedule (e.g., "Working Hours")
    - Add time slots for each day
    - Set as default schedule
 
-3. **Create Event Types**
+4. **Create Event Types**
    - Go to Event Types tab
    - Click "New Event Type"
    - Configure:
@@ -120,7 +129,7 @@ A comprehensive Calendly-like booking system built with React, TypeScript, and S
      - Booking rules
    - Activate the event type
 
-4. **Share Your Booking Link**
+5. **Share Your Booking Link**
    - Copy the booking link from event type card
    - Share with clients: `/book/your-username/event-slug`
 

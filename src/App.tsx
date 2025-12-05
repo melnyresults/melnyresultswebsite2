@@ -31,7 +31,6 @@ import BlogPublishConfirmation from './components/BlogPublishConfirmation';
 import MelnyPage from './components/MelnyPage';
 import TrackingScripts from './components/TrackingScripts';
 import { usePageMeta } from './hooks/usePageMeta';
-import { BookingDashboard } from './components/BookingDashboard';
 import { PublicBookingPage } from './components/PublicBookingPage';
 
 // Component to handle scroll to top on route change
@@ -170,14 +169,6 @@ function App() {
           element={
             <ProtectedRoute>
               <PlatformIntegrations />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/booking/dashboard"
-          element={
-            <ProtectedRoute>
-              <BookingDashboard />
             </ProtectedRoute>
           }
         />

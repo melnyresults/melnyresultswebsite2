@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Briefcase, TrendingUp, Edit3, LogOut, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Briefcase, TrendingUp, Edit3, Calendar, LogOut, User, Menu, X } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
@@ -9,8 +9,13 @@ import OpportunitiesView from './OpportunitiesView';
 import MarketingView from './MarketingView';
 import AdminDashboard from './AdminDashboard';
 import NotificationBell from './NotificationBell';
+import { EventTypesManager } from './EventTypesManager';
+import { AvailabilityManager } from './AvailabilityManager';
+import { BookingsManager } from './BookingsManager';
+import { BookingAnalytics } from './BookingAnalytics';
+import { ProfileSettings } from './ProfileSettings';
 
-type SidebarSection = 'dashboard' | 'opportunities' | 'marketing' | 'blog';
+type SidebarSection = 'dashboard' | 'opportunities' | 'marketing' | 'blog' | 'bookings';
 
 const CRMDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -38,6 +43,7 @@ const CRMDashboard: React.FC = () => {
     { id: 'opportunities' as SidebarSection, label: 'Opportunities', icon: Briefcase },
     { id: 'marketing' as SidebarSection, label: 'Marketing', icon: TrendingUp },
     { id: 'blog' as SidebarSection, label: 'Blog Builder', icon: Edit3 },
+    { id: 'bookings' as SidebarSection, label: 'Bookings', icon: Calendar },
   ];
 
   return (
@@ -143,7 +149,53 @@ const CRMDashboard: React.FC = () => {
         {activeSection === 'opportunities' && <OpportunitiesView />}
         {activeSection === 'marketing' && <MarketingView />}
         {activeSection === 'blog' && <AdminDashboard />}
+        {activeSection === 'bookings' && <BookingsSection />}
       </main>
+    </div>
+  );
+};
+
+const BookingsSection: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'event-types' | 'availability' | 'bookings' | 'analytics' | 'settings'>('event-types');
+
+  const tabs = [
+    { id: 'event-types' as const, label: 'Event Types' },
+    { id: 'availability' as const, label: 'Availability' },
+    { id: 'bookings' as const, label: 'Bookings' },
+    { id: 'analytics' as const, label: 'Analytics' },
+    { id: 'settings' as const, label: 'Settings' },
+  ];
+
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking System</h1>
+        <p className="text-gray-600">Manage your meeting types, availability, and bookings</p>
+      </div>
+
+      <div className="flex space-x-1 bg-white rounded-lg p-1 shadow-sm mb-8">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+              activeTab === tab.id
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm">
+        {activeTab === 'event-types' && <EventTypesManager />}
+        {activeTab === 'availability' && <AvailabilityManager />}
+        {activeTab === 'bookings' && <BookingsManager />}
+        {activeTab === 'analytics' && <BookingAnalytics />}
+        {activeTab === 'settings' && <ProfileSettings />}
+      </div>
     </div>
   );
 };
