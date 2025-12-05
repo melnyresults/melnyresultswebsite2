@@ -96,13 +96,16 @@ export const useBlogPosts = () => {
         .single();
 
       if (error) {
+        console.error('Supabase insert error:', error);
         throw error;
       }
 
       await fetchPosts();
       return { data: newPost, error: null };
     } catch (err) {
-      return { data: null, error: err instanceof Error ? err.message : 'An error occurred' };
+      console.error('Create post error:', err);
+      const errorMessage = err instanceof Error ? err.message : (typeof err === 'object' && err !== null ? JSON.stringify(err) : 'An error occurred');
+      return { data: null, error: errorMessage };
     }
   };
 
@@ -119,13 +122,16 @@ export const useBlogPosts = () => {
         .single();
 
       if (error) {
+        console.error('Supabase update error:', error);
         throw error;
       }
 
       await fetchPosts();
       return { data: updatedPost, error: null };
     } catch (err) {
-      return { data: null, error: err instanceof Error ? err.message : 'An error occurred' };
+      console.error('Update post error:', err);
+      const errorMessage = err instanceof Error ? err.message : (typeof err === 'object' && err !== null ? JSON.stringify(err) : 'An error occurred');
+      return { data: null, error: errorMessage };
     }
   };
 
