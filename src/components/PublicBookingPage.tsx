@@ -162,12 +162,31 @@ export const PublicBookingPage: React.FC = () => {
         availabilitySlots = slotsData || [];
       }
 
-      const { data: bookingsData } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('user_id', profile.id)
-        .gte('start_time', selectedDate.toISOString().split('T')[0])
-        .lte('start_time', new Date(selectedDate.getTime() + 86400000).toISOString());
+      const startDateStr = selectedDate.toISOString().split('T')[0];
+      const endDateStr = new Date(selectedDate.getTime() + 86400000).toISOString().split('T')[0];
+
+      const { data: bookingAvailability } = await supabase
+        .rpc('get_booking_availability', {
+          p_user_id: profile.id,
+          p_event_type_id: eventType.id,
+          p_start_date: startDateStr,
+          p_end_date: endDateStr
+        });
+
+      const bookingsData: Booking[] = (bookingAvailability || []).map((slot: any) => ({
+        id: '',
+        event_type_id: eventType.id,
+        user_id: profile.id,
+        guest_name: '',
+        guest_email: '',
+        start_time: `${slot.booking_date}T${slot.start_time}`,
+        end_time: `${slot.booking_date}T${slot.end_time}`,
+        timezone: profile.timezone,
+        status: 'confirmed' as const,
+        reminder_sent: false,
+        created_at: '',
+        updated_at: '',
+      }));
 
       const { data: overridesData } = await supabase
         .from('date_overrides')
