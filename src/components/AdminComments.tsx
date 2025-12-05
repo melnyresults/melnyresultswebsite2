@@ -5,10 +5,10 @@ import { supabase } from '../lib/supabase';
 interface Comment {
   id: string;
   post_id: string;
-  user_name: string;
-  user_email: string;
-  comment_text: string;
-  is_approved: boolean;
+  author_name: string;
+  author_email: string;
+  content: string;
+  approved: boolean;
   created_at: string;
 }
 
@@ -30,9 +30,9 @@ const AdminComments: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (filter === 'pending') {
-        query = query.eq('is_approved', false);
+        query = query.eq('approved', false);
       } else if (filter === 'approved') {
-        query = query.eq('is_approved', true);
+        query = query.eq('approved', true);
       }
 
       const { data, error } = await query;
@@ -50,7 +50,7 @@ const AdminComments: React.FC = () => {
     try {
       const { error } = await supabase
         .from('blog_comments')
-        .update({ is_approved: true })
+        .update({ approved: true })
         .eq('id', id);
 
       if (error) throw error;
@@ -87,7 +87,7 @@ const AdminComments: React.FC = () => {
     });
   };
 
-  const pendingCount = comments.filter(c => !c.is_approved).length;
+  const pendingCount = comments.filter(c => !c.approved).length;
 
   return (
     <div className="space-y-6">
@@ -152,7 +152,7 @@ const AdminComments: React.FC = () => {
             <div
               key={comment.id}
               className={`bg-white rounded-lg p-6 shadow-sm border ${
-                comment.is_approved ? 'border-green-200' : 'border-yellow-200'
+                comment.approved ? 'border-green-200' : 'border-yellow-200'
               }`}
             >
               <div className="flex items-start justify-between">
@@ -162,14 +162,14 @@ const AdminComments: React.FC = () => {
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{comment.user_name}</h3>
-                      <p className="text-sm text-gray-500">{comment.user_email}</p>
+                      <h3 className="font-semibold text-gray-900">{comment.author_name}</h3>
+                      <p className="text-sm text-gray-500">{comment.author_email}</p>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500">
                       <Calendar className="w-4 h-4" />
                       <span>{formatDate(comment.created_at)}</span>
                     </div>
-                    {comment.is_approved ? (
+                    {comment.approved ? (
                       <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
                         Approved
                       </span>
@@ -179,11 +179,11 @@ const AdminComments: React.FC = () => {
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-700 mt-3 leading-relaxed">{comment.comment_text}</p>
+                  <p className="text-gray-700 mt-3 leading-relaxed">{comment.content}</p>
                 </div>
 
                 <div className="flex gap-2 ml-4">
-                  {!comment.is_approved && (
+                  {!comment.approved && (
                     <button
                       onClick={() => approveComment(comment.id)}
                       className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"

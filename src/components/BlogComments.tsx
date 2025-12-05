@@ -5,8 +5,8 @@ import { generateFingerprint } from '../lib/fingerprint';
 
 interface Comment {
   id: string;
-  user_name: string;
-  comment_text: string;
+  author_name: string;
+  content: string;
   created_at: string;
 }
 
@@ -27,7 +27,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postId, postSlug }) => {
   const [formData, setFormData] = useState({
     user_name: '',
     user_email: '',
-    comment_text: ''
+    content: ''
   });
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postId, postSlug }) => {
         .from('blog_comments')
         .select('*')
         .eq('post_id', postId)
-        .eq('is_approved', true)
+        .eq('approved', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -117,7 +117,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postId, postSlug }) => {
 
     const sanitizedName = formData.user_name.trim();
     const sanitizedEmail = formData.user_email.trim().toLowerCase();
-    const sanitizedComment = formData.comment_text.trim();
+    const sanitizedComment = formData.content.trim();
 
     if (!sanitizedName || !sanitizedEmail || !sanitizedComment) {
       setError('Please fill in all fields');
@@ -137,16 +137,16 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postId, postSlug }) => {
         .from('blog_comments')
         .insert([{
           post_id: postId,
-          user_name: sanitizedName,
-          user_email: sanitizedEmail,
-          comment_text: sanitizedComment,
-          is_approved: false
+          author_name: sanitizedName,
+          author_email: sanitizedEmail,
+          content: sanitizedComment,
+          approved: false
         }]);
 
       if (error) throw error;
 
       setSuccess(true);
-      setFormData({ user_name: '', user_email: '', comment_text: '' });
+      setFormData({ user_name: '', user_email: '', content: '' });
 
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
@@ -247,15 +247,15 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postId, postSlug }) => {
             </div>
 
             <div>
-              <label htmlFor="comment_text" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
                 Comment *
               </label>
               <textarea
-                id="comment_text"
-                name="comment_text"
+                id="content"
+                name="content"
                 required
                 rows={4}
-                value={formData.comment_text}
+                value={formData.content}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent resize-none"
                 placeholder="Share your thoughts..."
@@ -295,13 +295,13 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ postId, postSlug }) => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h4 className="font-semibold text-gray-900">{comment.user_name}</h4>
+                      <h4 className="font-semibold text-gray-900">{comment.author_name}</h4>
                       <div className="flex items-center gap-1 text-sm text-gray-500">
                         <Calendar className="w-4 h-4" />
                         <span>{formatDate(comment.created_at)}</span>
                       </div>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">{comment.comment_text}</p>
+                    <p className="text-gray-700 leading-relaxed">{comment.content}</p>
                   </div>
                 </div>
               </div>
