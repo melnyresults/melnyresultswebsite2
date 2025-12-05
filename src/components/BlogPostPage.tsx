@@ -6,6 +6,7 @@ import { BlogPost } from '../lib/localStorage';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useBlogEngagement } from '../hooks/useBlogEngagement';
 import BlogComments from './BlogComments';
+import { supabase } from '../lib/supabase';
 
 const BlogPostPage: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,7 +17,8 @@ const BlogPostPage: React.FC = () => {
   const [hasLiked, setHasLiked] = useState(false);
   const [tableOfContents, setTableOfContents] = useState<Array<{id: string, text: string, level: number}>>([]);
   const [activeSection, setActiveSection] = useState('');
-  
+  const [commentCount, setCommentCount] = useState(0);
+
   const { slug } = useParams();
   const navigate = useNavigate();
   const { posts, likePost } = useBlogPosts();
@@ -49,6 +51,28 @@ const BlogPostPage: React.FC = () => {
       setLoading(false);
     }
   }, [posts, slug]);
+
+  // Fetch comment count
+  useEffect(() => {
+    if (!postId) return;
+
+    const fetchCommentCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('blog_comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', postId)
+          .eq('approved', true);
+
+        if (error) throw error;
+        setCommentCount(count || 0);
+      } catch (err) {
+        console.error('Error fetching comment count:', err);
+      }
+    };
+
+    fetchCommentCount();
+  }, [postId]);
   
   // Generate canonical URL for the current post
   const canonicalUrl = post && slug ? `${PRODUCTION_DOMAIN}/blog/${slug}` : `${PRODUCTION_DOMAIN}/blog`;
@@ -388,7 +412,7 @@ const BlogPostPage: React.FC = () => {
               </button>
               <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
                 <MessageCircle className="w-5 h-5" />
-                <span>{Math.floor(Math.random() * 10)}</span>
+                <span>{commentCount}</span>
               </button>
               <button 
                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors"
