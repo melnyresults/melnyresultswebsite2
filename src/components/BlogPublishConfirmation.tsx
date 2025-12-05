@@ -63,7 +63,7 @@ const BlogPublishConfirmation: React.FC = () => {
 
   const handleShare = () => {
     if (post) {
-      const postUrl = `${window.location.origin}/blog/${createSlug(post.title, post.id)}`;
+      const postUrl = `${import.meta.env.VITE_APP_URL || window.location.origin}/blog/${createSlug(post.title, post.id)}`;
       if (navigator.share) {
         navigator.share({
           title: post.title,

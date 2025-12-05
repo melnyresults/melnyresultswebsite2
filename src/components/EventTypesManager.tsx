@@ -44,7 +44,7 @@ export const EventTypesManager: React.FC = () => {
   };
 
   const copyBookingLink = (username: string, slug: string) => {
-    const link = `${window.location.origin}/book/${username}/${slug}`;
+    const link = `${import.meta.env.VITE_APP_URL || window.location.origin}/book/${username}/${slug}`;
     navigator.clipboard.writeText(link);
     alert('Booking link copied to clipboard!');
   };

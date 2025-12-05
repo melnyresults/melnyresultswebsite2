@@ -66,7 +66,7 @@ export const ProfileSettings: React.FC = () => {
             required
           />
           <p className="mt-1 text-sm text-gray-500">
-            Your booking page: {window.location.origin}/book/{formData.username}
+            Your booking page: {import.meta.env.VITE_APP_URL || window.location.origin}/book/{formData.username}
           </p>
         </div>
 
