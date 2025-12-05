@@ -69,9 +69,7 @@ export const useBlogEngagement = (postSlug: string) => {
         .from('blog_views')
         .insert([{
           post_id: id,
-          user_fingerprint: fingerprint,
-          viewed_at: new Date().toISOString(),
-          view_date: new Date().toISOString().split('T')[0]
+          user_fingerprint: fingerprint
         }]);
     } catch (err) {
       console.log('View already tracked or error:', err);

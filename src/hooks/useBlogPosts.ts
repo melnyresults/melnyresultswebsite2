@@ -8,57 +8,66 @@ export type BlogPost = {
   content: string;
   excerpt: string;
   author: string;
+  slug?: string;
+  image_url?: string;
   published_at: string;
   created_at: string;
   updated_at: string;
-  image_url?: string;
+  is_published: boolean;
   likes_count: number;
+  views_count: number;
   meta_title?: string;
   meta_description?: string;
-  slug?: string;
-  canonical_url?: string;
   keywords?: string;
   tags?: string;
-  is_published?: boolean;
+  canonical_url?: string;
   scheduled_publish_date?: string;
   noindex?: boolean;
   schema_type?: 'blog' | 'custom';
   custom_schema?: object;
   related_post_ids?: string[];
+  author_id?: string;
 };
+
+type CreatePostData = Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count'>;
+type UpdatePostData = Partial<CreatePostData>;
 
 export const useBlogPosts = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPosts = async (includeScheduled = false) => {
+  const fetchPosts = async (includeUnpublished = false) => {
     try {
       setLoading(true);
+      setError(null);
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const isAuthenticated = !!session;
 
       let query = supabase
         .from('blog_posts')
         .select('*')
         .order('published_at', { ascending: false });
 
-      if (!user && !includeScheduled) {
+      if (!isAuthenticated && !includeUnpublished) {
+        const now = new Date().toISOString();
         query = query
           .eq('is_published', true)
-          .or(`scheduled_publish_date.is.null,scheduled_publish_date.lte.${new Date().toISOString()}`);
+          .or(`scheduled_publish_date.is.null,scheduled_publish_date.lte.${now}`);
       }
 
-      const { data: blogPosts, error } = await query;
+      const { data, error: fetchError } = await query;
 
-      if (error) {
-        throw error;
+      if (fetchError) {
+        throw fetchError;
       }
 
-      setPosts(blogPosts || []);
+      setPosts(data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      setPosts([]);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch posts';
+      setError(errorMessage);
+      console.error('Fetch posts error:', err);
     } finally {
       setLoading(false);
     }
@@ -68,95 +77,93 @@ export const useBlogPosts = () => {
     fetchPosts();
   }, []);
 
-  const createPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
+  const createPost = async (postData: CreatePostData) => {
     try {
-      // Verify authentication before attempting insert
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        return { data: null, error: 'You must be logged in to create a post' };
+        return {
+          data: null,
+          error: 'You must be logged in to create a post'
+        };
       }
 
-      const { data: newPost, error } = await supabase
+      const { data, error: insertError } = await supabase
         .from('blog_posts')
         .insert([{
-          title: postData.title,
-          content: postData.content,
-          excerpt: postData.excerpt,
-          author: postData.author,
-          published_at: postData.published_at,
-          image_url: postData.image_url,
-          meta_title: postData.meta_title,
-          meta_description: postData.meta_description,
-          slug: postData.slug,
-          canonical_url: postData.canonical_url,
-          keywords: postData.keywords,
-          tags: postData.tags,
-          is_published: postData.is_published || false,
-          scheduled_publish_date: postData.scheduled_publish_date || null,
-          noindex: postData.noindex || false,
-          schema_type: postData.schema_type || 'blog',
-          custom_schema: postData.custom_schema || null,
-          related_post_ids: postData.related_post_ids || [],
+          ...postData,
+          author_id: session.user.id,
         }])
         .select()
         .single();
 
-      if (error) {
-        console.error('Supabase insert error:', error);
-        throw error;
+      if (insertError) {
+        throw insertError;
       }
 
       await fetchPosts();
-      return { data: newPost, error: null };
+      return { data, error: null };
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create post';
       console.error('Create post error:', err);
-      const errorMessage = err instanceof Error ? err.message : (typeof err === 'object' && err !== null ? JSON.stringify(err) : 'An error occurred');
       return { data: null, error: errorMessage };
     }
   };
 
-  const updatePost = async (id: string, postData: Partial<BlogPost>) => {
+  const updatePost = async (id: string, postData: UpdatePostData) => {
     try {
-      const { data: updatedPost, error } = await supabase
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        return {
+          data: null,
+          error: 'You must be logged in to update a post'
+        };
+      }
+
+      const { data, error: updateError } = await supabase
         .from('blog_posts')
-        .update({
-          ...postData,
-          updated_at: new Date().toISOString()
-        })
+        .update(postData)
         .eq('id', id)
         .select()
         .single();
 
-      if (error) {
-        console.error('Supabase update error:', error);
-        throw error;
+      if (updateError) {
+        throw updateError;
       }
 
       await fetchPosts();
-      return { data: updatedPost, error: null };
+      return { data, error: null };
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update post';
       console.error('Update post error:', err);
-      const errorMessage = err instanceof Error ? err.message : (typeof err === 'object' && err !== null ? JSON.stringify(err) : 'An error occurred');
       return { data: null, error: errorMessage };
     }
   };
 
   const deletePost = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        return { error: 'You must be logged in to delete a post' };
+      }
+
+      const { error: deleteError } = await supabase
         .from('blog_posts')
         .delete()
         .eq('id', id);
 
-      if (error) {
-        throw error;
+      if (deleteError) {
+        throw deleteError;
       }
 
       await fetchPosts();
       return { error: null };
     } catch (err) {
-      return { error: err instanceof Error ? err.message : 'An error occurred' };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete post';
+      console.error('Delete post error:', err);
+      return { error: errorMessage };
     }
   };
 
@@ -164,7 +171,6 @@ export const useBlogPosts = () => {
     try {
       const fingerprint = generateFingerprint();
 
-      // Check if user already liked this post
       const { data: existingLike } = await supabase
         .from('blog_likes')
         .select('id')
@@ -176,27 +182,44 @@ export const useBlogPosts = () => {
         return { error: 'You have already liked this post' };
       }
 
-      // Add like
-      const { error: likeError } = await supabase
+      const { error: insertError } = await supabase
         .from('blog_likes')
-        .insert([{ post_id: postId, user_fingerprint: fingerprint }]);
+        .insert([{
+          post_id: postId,
+          user_fingerprint: fingerprint
+        }]);
 
-      if (likeError) {
-        throw likeError;
+      if (insertError) {
+        throw insertError;
       }
 
-      // Fetch updated post to get new likes count
-      const { data: updatedPost } = await supabase
-        .from('blog_posts')
-        .select('likes_count')
-        .eq('id', postId)
-        .single();
-
-      // Refresh posts list
       await fetchPosts();
       return { error: null };
     } catch (err) {
-      return { error: err instanceof Error ? err.message : 'An error occurred' };
+      const errorMessage = err instanceof Error ? err.message : 'Failed to like post';
+      console.error('Like post error:', err);
+      return { error: errorMessage };
+    }
+  };
+
+  const getPostBySlug = async (slug: string) => {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('is_published', true)
+        .maybeSingle();
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch post';
+      console.error('Get post by slug error:', err);
+      return { data: null, error: errorMessage };
     }
   };
 
@@ -208,6 +231,7 @@ export const useBlogPosts = () => {
     updatePost,
     deletePost,
     likePost,
+    getPostBySlug,
     refetch: fetchPosts,
   };
 };
