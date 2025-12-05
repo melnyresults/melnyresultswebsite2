@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
-import { Calendar, Settings, BarChart3, Clock, User, LogOut } from 'lucide-react';
+import { Calendar, Settings, BarChart3, Clock, User, LogOut, CheckCircle, XCircle, X } from 'lucide-react';
 import { EventTypesManager } from './EventTypesManager';
 import { AvailabilityManager } from './AvailabilityManager';
 import { BookingsManager } from './BookingsManager';
@@ -14,6 +14,28 @@ export const BookingDashboard: React.FC = () => {
   const { signOut } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile();
   const [activeTab, setActiveTab] = useState<TabType>('event-types');
+  const [calendarMessage, setCalendarMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const calendarStatus = params.get('calendar');
+    const message = params.get('message');
+
+    if (calendarStatus === 'connected') {
+      setCalendarMessage({ type: 'success', text: 'Google Calendar connected successfully!' });
+      setActiveTab('settings');
+      window.history.replaceState({}, '', '/admin/dashboard');
+      setTimeout(() => setCalendarMessage(null), 5000);
+    } else if (calendarStatus === 'error') {
+      setCalendarMessage({
+        type: 'error',
+        text: message ? decodeURIComponent(message) : 'Failed to connect Google Calendar'
+      });
+      setActiveTab('settings');
+      window.history.replaceState({}, '', '/admin/dashboard');
+      setTimeout(() => setCalendarMessage(null), 8000);
+    }
+  }, []);
 
   if (profileLoading) {
     return (
@@ -93,6 +115,37 @@ export const BookingDashboard: React.FC = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {calendarMessage && (
+          <div className={`mb-6 p-4 rounded-lg border flex items-start justify-between ${
+            calendarMessage.type === 'success'
+              ? 'bg-green-50 border-green-200'
+              : 'bg-red-50 border-red-200'
+          }`}>
+            <div className="flex items-start space-x-3">
+              {calendarMessage.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              )}
+              <p className={`text-sm font-medium ${
+                calendarMessage.type === 'success' ? 'text-green-800' : 'text-red-800'
+              }`}>
+                {calendarMessage.text}
+              </p>
+            </div>
+            <button
+              onClick={() => setCalendarMessage(null)}
+              className={`p-1 rounded ${
+                calendarMessage.type === 'success'
+                  ? 'hover:bg-green-100 text-green-600'
+                  : 'hover:bg-red-100 text-red-600'
+              }`}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         <div className="flex space-x-1 bg-white rounded-lg p-1 shadow-sm mb-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
