@@ -7,6 +7,8 @@ import { generateTimeSlots, getAvailableDates } from '../lib/availabilityUtils';
 import { EventType } from '../hooks/useEventTypes';
 import { Booking } from '../hooks/useBookings';
 import { AvailabilitySlot, DateOverride } from '../hooks/useAvailability';
+import { useCalendarAvailability } from '../hooks/useCalendarAvailability';
+import { createCalendarEvent } from '../lib/calendarService';
 
 interface UserProfile {
   full_name: string;
@@ -16,6 +18,7 @@ interface UserProfile {
   company?: string;
   welcome_message: string;
   timezone: string;
+  id: string;
 }
 
 export const PublicBookingPage: React.FC = () => {
@@ -37,6 +40,11 @@ export const PublicBookingPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [bookingStep, setBookingStep] = useState<'select-date' | 'select-time' | 'guest-info' | 'confirmation'>('select-date');
   const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  const { isTimeSlotBusy, hasConnection } = useCalendarAvailability(
+    profile?.id || '',
+    selectedDate
+  );
 
   useEffect(() => {
     loadBookingData();
@@ -175,7 +183,17 @@ export const PublicBookingPage: React.FC = () => {
         overridesData || []
       );
 
-      setAvailableSlots(slots.filter(s => s.available));
+      const filteredSlots = slots.filter(s => {
+        if (!s.available) return false;
+
+        if (hasConnection && isTimeSlotBusy) {
+          return !isTimeSlotBusy(s.start, s.end);
+        }
+
+        return true;
+      });
+
+      setAvailableSlots(filteredSlots);
     } catch (error) {
       console.error('Error loading slots:', error);
     }
@@ -198,20 +216,39 @@ export const PublicBookingPage: React.FC = () => {
     if (!selectedSlot || !eventType || !profile) return;
 
     try {
-      const { error } = await supabase.from('bookings').insert({
-        event_type_id: eventType.id,
-        user_id: profile.id,
-        guest_name: guestData.name,
-        guest_email: guestData.email,
-        guest_phone: guestData.phone || null,
-        start_time: selectedSlot.start.toISOString(),
-        end_time: selectedSlot.end.toISOString(),
-        timezone: guestData.timezone,
-        notes: guestData.notes || null,
-        status: eventType.requires_confirmation ? 'pending' : 'confirmed',
-      });
+      const { data: booking, error } = await supabase
+        .from('bookings')
+        .insert({
+          event_type_id: eventType.id,
+          user_id: profile.id,
+          guest_name: guestData.name,
+          guest_email: guestData.email,
+          guest_phone: guestData.phone || null,
+          start_time: selectedSlot.start.toISOString(),
+          end_time: selectedSlot.end.toISOString(),
+          timezone: guestData.timezone,
+          notes: guestData.notes || null,
+          status: eventType.requires_confirmation ? 'pending' : 'confirmed',
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      if (booking && hasConnection) {
+        await createCalendarEvent({
+          userId: profile.id,
+          bookingId: booking.id,
+          summary: `${eventType.name} with ${guestData.name}`,
+          description: guestData.notes || `Meeting scheduled via booking system`,
+          startTime: selectedSlot.start.toISOString(),
+          endTime: selectedSlot.end.toISOString(),
+          attendeeEmail: guestData.email,
+          attendeeName: guestData.name,
+          location: eventType.location_type === 'custom' ? eventType.location_details : eventType.location_type,
+          timezone: guestData.timezone,
+        });
+      }
 
       setBookingSuccess(true);
       setBookingStep('confirmation');

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { TIMEZONE_LIST } from '../lib/timeUtils';
 import { Save } from 'lucide-react';
+import { GoogleCalendarConnection } from './GoogleCalendarConnection';
 
 export const ProfileSettings: React.FC = () => {
   const { profile, updateProfile } = useUserProfile();
@@ -139,6 +140,11 @@ export const ProfileSettings: React.FC = () => {
           <span>{saving ? 'Saving...' : 'Save Changes'}</span>
         </button>
       </form>
+
+      <div className="mt-8 max-w-2xl">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Calendar Integration</h3>
+        <GoogleCalendarConnection />
+      </div>
     </div>
   );
 };
