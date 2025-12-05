@@ -20,12 +20,11 @@ const PostEditor: React.FC = () => {
     author: 'Ivan Melnychenko',
     image_url: '',
     published_at: new Date().toISOString().split('T')[0],
-    category: 'Growth Strategies',
     tags: '',
     meta_description: '',
     meta_title: '',
-    scheduled_for: '',
-    comments_enabled: true,
+    scheduled_publish_date: '',
+    is_published: false,
     slug: '',
     canonical_url: '',
     keywords: '',
@@ -42,8 +41,6 @@ const PostEditor: React.FC = () => {
     ogTitle: `${isEditing ? 'Edit Post' : 'New Post'} - Blog Editor`,
     ogDescription: `${isEditing ? 'Edit your' : 'Create a new'} blog post with our rich text editor.`,
   });
-
-  const categories = ['Growth Strategies', 'Success Stories', 'Tips', 'Case Studies'];
 
   useEffect(() => {
     if (isEditing && id) {
