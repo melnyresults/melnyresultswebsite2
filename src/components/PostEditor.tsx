@@ -146,11 +146,25 @@ const PostEditor: React.FC = () => {
       setLoading(false);
       return;
     }
-    const postData = {
-      ...formData,
+    const postData: any = {
+      title: formData.title,
+      content: formData.content,
       excerpt: formData.excerpt || generateExcerpt(formData.content),
+      author: formData.author,
+      image_url: formData.image_url || null,
       published_at: new Date(formData.published_at).toISOString(),
+      tags: formData.tags || null,
+      meta_description: formData.meta_description || null,
+      meta_title: formData.meta_title || null,
+      is_published: formData.is_published,
+      slug: formData.slug || null,
+      canonical_url: formData.canonical_url || null,
+      keywords: formData.keywords || null,
     };
+
+    if (formData.scheduled_publish_date) {
+      postData.scheduled_publish_date = new Date(formData.scheduled_publish_date).toISOString();
+    }
 
     try {
       let postId = id;
