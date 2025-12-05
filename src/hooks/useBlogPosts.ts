@@ -70,6 +70,13 @@ export const useBlogPosts = () => {
 
   const createPost = async (postData: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count'>) => {
     try {
+      // Verify authentication before attempting insert
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        return { data: null, error: 'You must be logged in to create a post' };
+      }
+
       const { data: newPost, error } = await supabase
         .from('blog_posts')
         .insert([{
